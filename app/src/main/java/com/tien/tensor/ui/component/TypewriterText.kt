@@ -19,7 +19,8 @@ fun TypewriterText(
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     color: Color = Color.Unspecified,
-    charDelayMs: Long = 55L
+    charDelayMs: Long = 55L,
+    onComplete: (() -> Unit)? = null
 ) {
     var visibleCount by remember(fullText) { mutableIntStateOf(0) }
 
@@ -29,6 +30,7 @@ fun TypewriterText(
             delay(charDelayMs)
             visibleCount = index + 1
         }
+        onComplete?.invoke()
     }
 
     Text(

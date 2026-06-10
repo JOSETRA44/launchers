@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,12 +17,12 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tien.tensor.di.AppModule
 import com.tien.tensor.presentation.applist.AppListScreen
+import com.tien.tensor.presentation.boot.BootScreen
 import com.tien.tensor.presentation.launcher.LauncherScreen
 import com.tien.tensor.presentation.navigation.AppDestination
 import com.tien.tensor.presentation.settings.SettingsScreen
 import com.tien.tensor.presentation.settings.SettingsViewModel
 import com.tien.tensor.ui.theme.LauncherTheme
-import androidx.compose.foundation.layout.Box
 import com.tien.tensor.ui.theme.TensorTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,9 +36,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Force light-on-dark system bar icons
         WindowCompat.getInsetsController(window, window.decorView).apply {
-            isAppearanceLightStatusBars = false
+            isAppearanceLightStatusBars    = false
             isAppearanceLightNavigationBars = false
         }
 
@@ -47,6 +47,8 @@ class MainActivity : ComponentActivity() {
             TensorTheme(themeId = settingsState.selectedThemeId) {
                 val colors = LauncherTheme.colors
 
+                // Boot screen shown once per process lifecycle (survives rotation via rememberSaveable)
+                var hasBooted   by rememberSaveable { mutableStateOf(false) }
                 var destination by rememberSaveable { mutableStateOf(AppDestination.HOME) }
 
                 Box(
@@ -54,17 +56,20 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(colors.background)
                 ) {
-                    when (destination) {
-                        AppDestination.HOME -> LauncherScreen(
-                            onNavigate = { destination = it }
-                        )
-                        AppDestination.APP_LIST -> AppListScreen(
-                            onNavigateBack = { destination = AppDestination.HOME }
-                        )
-                        AppDestination.SETTINGS -> SettingsScreen(
-                            onNavigateBack = { destination = AppDestination.HOME },
-                            viewModel = settingsViewModel
-                        )
+                    if (!hasBooted) {
+                        BootScreen(onBootComplete = { hasBooted = true })
+                    } else {
+                        when (destination) {
+                            AppDestination.HOME ->
+                                LauncherScreen(onNavigate = { destination = it })
+                            AppDestination.APP_LIST ->
+                                AppListScreen(onNavigateBack = { destination = AppDestination.HOME })
+                            AppDestination.SETTINGS ->
+                                SettingsScreen(
+                                    onNavigateBack = { destination = AppDestination.HOME },
+                                    viewModel      = settingsViewModel
+                                )
+                        }
                     }
                 }
             }

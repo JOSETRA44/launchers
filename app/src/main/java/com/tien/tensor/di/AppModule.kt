@@ -6,24 +6,35 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.tien.tensor.data.launcher.AndroidAppLauncher
+import com.tien.tensor.data.launcher.AppInfoLauncherImpl
+import com.tien.tensor.data.launcher.WebSearchLauncherImpl
 import com.tien.tensor.data.repository.AppRepositoryImpl
 import com.tien.tensor.data.repository.AppUsageRepositoryImpl
+import com.tien.tensor.data.repository.PinnedAppsRepositoryImpl
 import com.tien.tensor.data.repository.ThemeRepositoryImpl
 import com.tien.tensor.data.source.AppDataSource
 import com.tien.tensor.data.source.AppUsageDataSource
+import com.tien.tensor.data.source.PinnedAppsDataSource
 import com.tien.tensor.data.source.PreferencesDataSource
+import com.tien.tensor.domain.port.AppInfoLauncher
 import com.tien.tensor.domain.port.AppLauncher
 import com.tien.tensor.domain.port.AppRepository
 import com.tien.tensor.domain.port.AppUsageRepository
+import com.tien.tensor.domain.port.PinnedAppsRepository
 import com.tien.tensor.domain.port.ThemeRepository
+import com.tien.tensor.domain.port.WebSearchLauncher
 import com.tien.tensor.domain.usecase.ClearHistoryUseCase
 import com.tien.tensor.domain.usecase.GetInstalledAppsUseCase
+import com.tien.tensor.domain.usecase.GetPinnedAppsUseCase
 import com.tien.tensor.domain.usecase.GetSmartAppsUseCase
 import com.tien.tensor.domain.usecase.GetThemeUseCase
 import com.tien.tensor.domain.usecase.LaunchAppUseCase
+import com.tien.tensor.domain.usecase.ParseCommandUseCase
+import com.tien.tensor.domain.usecase.PinAppUseCase
 import com.tien.tensor.domain.usecase.SearchAppsUseCase
 import com.tien.tensor.domain.usecase.SetThemeUseCase
 import com.tien.tensor.domain.usecase.TrackAppLaunchUseCase
+import com.tien.tensor.domain.usecase.UnpinAppUseCase
 import com.tien.tensor.presentation.applist.AppListViewModel
 import com.tien.tensor.presentation.launcher.LauncherViewModel
 import com.tien.tensor.presentation.settings.SettingsViewModel
@@ -49,19 +60,25 @@ object AppModule {
             produceFile = { appContext.preferencesDataStoreFile("tensor_prefs") }
         )
     }
-
     private val usageDataStore by lazy {
         PreferenceDataStoreFactory.create(
             scope = ioScope,
             produceFile = { appContext.preferencesDataStoreFile("tensor_usage") }
         )
     }
+    private val pinnedDataStore by lazy {
+        PreferenceDataStoreFactory.create(
+            scope = ioScope,
+            produceFile = { appContext.preferencesDataStoreFile("tensor_pinned") }
+        )
+    }
 
-    private val appDataSource by lazy { AppDataSource(appContext.packageManager) }
+    private val appDataSource         by lazy { AppDataSource(appContext.packageManager) }
     private val preferencesDataSource by lazy { PreferencesDataSource(themeDataStore) }
-    private val appUsageDataSource by lazy { AppUsageDataSource(usageDataStore) }
+    private val appUsageDataSource    by lazy { AppUsageDataSource(usageDataStore) }
+    private val pinnedAppsDataSource  by lazy { PinnedAppsDataSource(pinnedDataStore) }
 
-    // ── Ports / Repositories ─────────────────────────────────────────────────
+    // ── Repositories ──────────────────────────────────────────────────────────
 
     private val appRepository: AppRepository by lazy {
         AppRepositoryImpl(appDataSource, appContext)
@@ -72,28 +89,48 @@ object AppModule {
     private val appUsageRepository: AppUsageRepository by lazy {
         AppUsageRepositoryImpl(appUsageDataSource)
     }
-    private val appLauncher: AppLauncher by lazy { AndroidAppLauncher(appContext) }
+    private val pinnedAppsRepository: PinnedAppsRepository by lazy {
+        PinnedAppsRepositoryImpl(pinnedAppsDataSource)
+    }
 
-    // ── Use Cases ────────────────────────────────────────────────────────────
+    // ── Infrastructure ports ──────────────────────────────────────────────────
 
-    val getInstalledAppsUseCase by lazy { GetInstalledAppsUseCase(appRepository) }
-    val searchAppsUseCase by lazy { SearchAppsUseCase() }
-    val launchAppUseCase by lazy { LaunchAppUseCase(appLauncher) }
-    val getThemeUseCase by lazy { GetThemeUseCase(themeRepository) }
-    val setThemeUseCase by lazy { SetThemeUseCase(themeRepository) }
-    val trackAppLaunchUseCase by lazy { TrackAppLaunchUseCase(appUsageRepository) }
-    val getSmartAppsUseCase by lazy { GetSmartAppsUseCase(appUsageRepository, appRepository) }
-    val clearHistoryUseCase by lazy { ClearHistoryUseCase(appUsageRepository) }
+    private val appLauncher: AppLauncher         by lazy { AndroidAppLauncher(appContext) }
+    private val appInfoLauncher: AppInfoLauncher by lazy { AppInfoLauncherImpl(appContext) }
+    private val webSearchLauncher: WebSearchLauncher by lazy { WebSearchLauncherImpl(appContext) }
 
-    // ── ViewModel Factories ──────────────────────────────────────────────────
+    // ── Use Cases ─────────────────────────────────────────────────────────────
+
+    private val getInstalledAppsUseCase by lazy { GetInstalledAppsUseCase(appRepository) }
+    private val searchAppsUseCase       by lazy { SearchAppsUseCase() }
+    private val launchAppUseCase        by lazy { LaunchAppUseCase(appLauncher) }
+    private val getThemeUseCase         by lazy { GetThemeUseCase(themeRepository) }
+    val setThemeUseCase                 by lazy { SetThemeUseCase(themeRepository) }
+    private val trackAppLaunchUseCase   by lazy { TrackAppLaunchUseCase(appUsageRepository) }
+    private val getSmartAppsUseCase     by lazy { GetSmartAppsUseCase(appUsageRepository, appRepository) }
+    private val clearHistoryUseCase     by lazy { ClearHistoryUseCase(appUsageRepository) }
+    private val getPinnedAppsUseCase    by lazy { GetPinnedAppsUseCase(pinnedAppsRepository) }
+    private val pinAppUseCase           by lazy { PinAppUseCase(pinnedAppsRepository) }
+    private val unpinAppUseCase         by lazy { UnpinAppUseCase(pinnedAppsRepository) }
+    private val parseCommandUseCase     by lazy { ParseCommandUseCase() }
+
+    // ── ViewModel Factories ───────────────────────────────────────────────────
 
     fun launcherViewModelFactory() = factory {
         LauncherViewModel(
-            getInstalledAppsUseCase,
-            getSmartAppsUseCase,
-            searchAppsUseCase,
-            launchAppUseCase,
-            trackAppLaunchUseCase
+            getInstalledAppsUseCase = getInstalledAppsUseCase,
+            getSmartAppsUseCase     = getSmartAppsUseCase,
+            getPinnedAppsUseCase    = getPinnedAppsUseCase,
+            searchAppsUseCase       = searchAppsUseCase,
+            launchAppUseCase        = launchAppUseCase,
+            trackAppLaunchUseCase   = trackAppLaunchUseCase,
+            clearHistoryUseCase     = clearHistoryUseCase,
+            pinAppUseCase           = pinAppUseCase,
+            unpinAppUseCase         = unpinAppUseCase,
+            parseCommandUseCase     = parseCommandUseCase,
+            appInfoLauncher         = appInfoLauncher,
+            webSearchLauncher       = webSearchLauncher,
+            setThemeUseCase         = setThemeUseCase
         )
     }
 

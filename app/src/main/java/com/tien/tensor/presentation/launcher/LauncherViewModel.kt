@@ -3,15 +3,28 @@ package com.tien.tensor.presentation.launcher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tien.tensor.domain.model.AppInfo
+import com.tien.tensor.domain.model.CommandAction
 import com.tien.tensor.domain.model.SmartApp
+import com.tien.tensor.domain.port.AppInfoLauncher
+import com.tien.tensor.domain.port.WebSearchLauncher
+import com.tien.tensor.domain.usecase.ClearHistoryUseCase
 import com.tien.tensor.domain.usecase.GetInstalledAppsUseCase
+import com.tien.tensor.domain.usecase.GetPinnedAppsUseCase
 import com.tien.tensor.domain.usecase.GetSmartAppsUseCase
 import com.tien.tensor.domain.usecase.LaunchAppUseCase
+import com.tien.tensor.domain.usecase.ParseCommandUseCase
+import com.tien.tensor.domain.usecase.PinAppUseCase
 import com.tien.tensor.domain.usecase.SearchAppsUseCase
+import com.tien.tensor.domain.usecase.SetThemeUseCase
 import com.tien.tensor.domain.usecase.TrackAppLaunchUseCase
+import com.tien.tensor.domain.usecase.UnpinAppUseCase
+import com.tien.tensor.presentation.navigation.AppDestination
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,9 +35,17 @@ import java.util.Locale
 class LauncherViewModel(
     private val getInstalledAppsUseCase: GetInstalledAppsUseCase,
     private val getSmartAppsUseCase: GetSmartAppsUseCase,
+    private val getPinnedAppsUseCase: GetPinnedAppsUseCase,
     private val searchAppsUseCase: SearchAppsUseCase,
     private val launchAppUseCase: LaunchAppUseCase,
-    private val trackAppLaunchUseCase: TrackAppLaunchUseCase
+    private val trackAppLaunchUseCase: TrackAppLaunchUseCase,
+    private val clearHistoryUseCase: ClearHistoryUseCase,
+    private val pinAppUseCase: PinAppUseCase,
+    private val unpinAppUseCase: UnpinAppUseCase,
+    private val parseCommandUseCase: ParseCommandUseCase,
+    private val appInfoLauncher: AppInfoLauncher,
+    private val webSearchLauncher: WebSearchLauncher,
+    private val setThemeUseCase: SetThemeUseCase
 ) : ViewModel() {
 
     private val timeFmt = SimpleDateFormat("HH:mm:ss", Locale.US)
@@ -35,8 +56,10 @@ class LauncherViewModel(
     )
     val uiState: StateFlow<LauncherUiState> = _state.asStateFlow()
 
+    private val _navEvents = MutableSharedFlow<AppDestination>(extraBufferCapacity = 1)
+    val navigationEvents: SharedFlow<AppDestination> = _navEvents.asSharedFlow()
+
     init {
-        // Live installed app list
         viewModelScope.launch {
             getInstalledAppsUseCase().collect { apps ->
                 _state.update { s ->
@@ -48,18 +71,18 @@ class LauncherViewModel(
                 }
             }
         }
-        // Smart recent apps (re-emits after each tracked launch)
         viewModelScope.launch {
             getSmartAppsUseCase().collect { smart ->
                 _state.update { s ->
-                    s.copy(
-                        smartApps     = smart,
-                        searchResults = smartSearch(s.searchQuery, s.allApps, smart)
-                    )
+                    s.copy(smartApps = smart, searchResults = smartSearch(s.searchQuery, s.allApps, smart))
                 }
             }
         }
-        // 1-second clock tick
+        viewModelScope.launch {
+            getPinnedAppsUseCase().collect { pinned ->
+                _state.update { it.copy(pinnedApps = pinned) }
+            }
+        }
         viewModelScope.launch {
             while (true) {
                 delay(1_000)
@@ -68,13 +91,28 @@ class LauncherViewModel(
         }
     }
 
+    // ── Public API ────────────────────────────────────────────────────────────
+
     fun onSearchQueryChanged(query: String) {
         _state.update { s ->
-            s.copy(
-                searchQuery   = query,
-                searchResults = smartSearch(query, s.allApps, s.smartApps)
-            )
+            s.copy(searchQuery = query, searchResults = smartSearch(query, s.allApps, s.smartApps))
         }
+    }
+
+    fun onSearchSubmit() {
+        val s = _state.value
+        val input = s.searchQuery.trim()
+        if (input.isBlank()) return
+
+        val action = parseCommandUseCase(input)
+        if (action != null) {
+            addToHistory(input)
+            executeCommand(action)
+        } else {
+            val topApp = s.searchResults.firstOrNull() ?: s.allApps.firstOrNull() ?: return
+            onAppLaunch(topApp.packageName, topApp.appName)
+        }
+        _state.update { it.copy(searchQuery = "") }
     }
 
     fun onAppLaunch(packageName: String, appName: String) {
@@ -87,15 +125,91 @@ class LauncherViewModel(
         }
     }
 
-    /**
-     * Smart search: exact-prefix matches first, then recently-used apps that
-     * match float above the rest, then alphabetical order.
-     */
-    private fun smartSearch(
-        query: String,
-        apps: List<AppInfo>,
-        smart: List<SmartApp>
-    ): List<AppInfo> {
+    fun onDismissHelp() { _state.update { it.copy(showHelp = false) } }
+
+    fun onHistoryTap(command: String) { _state.update { it.copy(searchQuery = command) } }
+
+    // ── Command execution ─────────────────────────────────────────────────────
+
+    private fun executeCommand(action: CommandAction) {
+        when (action) {
+            is CommandAction.WebSearch -> {
+                webSearchLauncher.search(action.query)
+                showOutput("> Searching: \"${action.query}\"...")
+            }
+            is CommandAction.OpenAppInfo -> {
+                val app = fuzzyFind(action.appQuery) ?: run { showOutput("> Not found: \"${action.appQuery}\""); return }
+                appInfoLauncher.open(app.packageName)
+                showOutput("> Info: ${app.appName}")
+            }
+            is CommandAction.LaunchApp -> {
+                val app = fuzzyFind(action.appQuery) ?: run { showOutput("> Not found: \"${action.appQuery}\""); return }
+                onAppLaunch(app.packageName, app.appName)
+            }
+            is CommandAction.PinApp -> {
+                val app = fuzzyFind(action.appQuery) ?: run { showOutput("> Not found: \"${action.appQuery}\""); return }
+                viewModelScope.launch {
+                    val ok = pinAppUseCase(app.packageName, app.appName)
+                    showOutput(if (ok) "> Pinned: ${app.appName}" else "> Dock full or already pinned.")
+                }
+            }
+            is CommandAction.UnpinApp -> {
+                val app = fuzzyFind(action.appQuery) ?: run { showOutput("> Not found: \"${action.appQuery}\""); return }
+                viewModelScope.launch {
+                    unpinAppUseCase(app.packageName)
+                    showOutput("> Unpinned: ${app.appName}")
+                }
+            }
+            is CommandAction.SetTheme -> {
+                viewModelScope.launch {
+                    setThemeUseCase(action.themeId)
+                    showOutput("> Theme: ${action.themeId.displayName}")
+                }
+            }
+            CommandAction.ShowHelp    -> _state.update { it.copy(showHelp = true, commandOutput = null) }
+            CommandAction.ClearHistory -> {
+                viewModelScope.launch {
+                    clearHistoryUseCase()
+                    showOutput("> Launch history cleared.")
+                }
+            }
+            CommandAction.OpenSettings -> {
+                viewModelScope.launch { _navEvents.emit(AppDestination.SETTINGS) }
+                showOutput("> Opening settings...")
+            }
+            CommandAction.OpenAppList -> {
+                viewModelScope.launch { _navEvents.emit(AppDestination.APP_LIST) }
+                showOutput("> Opening apps...")
+            }
+            is CommandAction.Unknown -> showOutput("> Unknown: \"${action.input}\". Type /help.")
+        }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private fun showOutput(msg: String) {
+        _state.update { it.copy(commandOutput = msg) }
+        viewModelScope.launch {
+            delay(3_500)
+            _state.update { s -> if (s.commandOutput == msg) s.copy(commandOutput = null) else s }
+        }
+    }
+
+    private fun addToHistory(input: String) {
+        _state.update { s ->
+            s.copy(commandHistory = (listOf(input) + s.commandHistory.filter { it != input }).take(10))
+        }
+    }
+
+    private fun fuzzyFind(query: String): AppInfo? {
+        val apps = _state.value.allApps
+        val q = query.trim().lowercase()
+        return apps.firstOrNull { it.appName.lowercase() == q }
+            ?: apps.firstOrNull { it.appName.lowercase().startsWith(q) }
+            ?: apps.firstOrNull { it.appName.lowercase().contains(q) }
+    }
+
+    private fun smartSearch(query: String, apps: List<AppInfo>, smart: List<SmartApp>): List<AppInfo> {
         val base = searchAppsUseCase(query, apps)
         if (query.isBlank()) return base
         val q = query.trim().lowercase()
