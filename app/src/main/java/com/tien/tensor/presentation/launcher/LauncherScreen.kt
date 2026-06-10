@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tien.tensor.di.AppModule
 import com.tien.tensor.domain.model.AppInfo
+import com.tien.tensor.domain.model.SmartApp
 import com.tien.tensor.presentation.navigation.AppDestination
 import com.tien.tensor.ui.component.TerminalButton
 import com.tien.tensor.ui.component.TerminalDivider
@@ -64,7 +65,6 @@ fun LauncherScreen(
         ) {
             Spacer(Modifier.height(TensorSpacing.md))
 
-            // Boot header with typewriter
             TypewriterText(
                 fullText = "TENSOR OS [v1.0.0] — READY",
                 style = MaterialTheme.typography.labelMedium,
@@ -93,7 +93,6 @@ fun LauncherScreen(
 
             TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
-            // Search field
             TerminalSearchField(
                 query = state.searchQuery,
                 onQueryChange = viewModel::onSearchQueryChanged,
@@ -102,7 +101,6 @@ fun LauncherScreen(
 
             Spacer(Modifier.height(TensorSpacing.sm))
 
-            // Content: search results OR quick access
             if (state.searchQuery.isNotBlank()) {
                 TerminalSectionLabel(label = "RESULTS (${state.searchResults.size})")
                 Spacer(Modifier.height(TensorSpacing.xs))
@@ -115,21 +113,33 @@ fun LauncherScreen(
                     }
                 }
             } else {
-                TerminalSectionLabel(label = "QUICK ACCESS")
+                val recentApps = state.smartApps
+                val fallback = state.allApps.take(5)
+                val showSmart = recentApps.isNotEmpty()
+
+                TerminalSectionLabel(label = if (showSmart) "RECENT" else "APPS")
                 Spacer(Modifier.height(TensorSpacing.xs))
                 LazyColumn(modifier = Modifier.weight(1f)) {
-                    items(state.quickAccessApps, key = { it.packageName }) { app ->
-                        AppRowItem(
-                            app = app,
-                            onLaunch = { viewModel.onAppLaunch(app.packageName, app.appName) }
-                        )
+                    if (showSmart) {
+                        items(recentApps, key = { it.packageName }) { app ->
+                            SmartAppRow(
+                                app = app,
+                                onLaunch = { viewModel.onAppLaunch(app.packageName, app.appName) }
+                            )
+                        }
+                    } else {
+                        items(fallback, key = { it.packageName }) { app ->
+                            AppRowItem(
+                                app = app,
+                                onLaunch = { viewModel.onAppLaunch(app.packageName, app.appName) }
+                            )
+                        }
                     }
                 }
             }
 
             TerminalDivider()
 
-            // Nav row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -170,6 +180,39 @@ fun LauncherScreen(
 }
 
 @Composable
+private fun SmartAppRow(app: SmartApp, onLaunch: () -> Unit) {
+    val colors = LauncherTheme.colors
+    val interactionSource = remember { MutableInteractionSource() }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(interactionSource = interactionSource, indication = null, onClick = onLaunch)
+            .padding(vertical = TensorSpacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "> ${app.appName}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.onBackground,
+            modifier = Modifier.weight(1f)
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
+            Text(
+                text = "×${app.launchCount}",
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.terminalPrompt
+            )
+            Text(
+                text = "[${timeAgo(app.lastLaunchAt)}]",
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.primaryDim
+            )
+        }
+    }
+}
+
+@Composable
 private fun AppRowItem(app: AppInfo, onLaunch: () -> Unit) {
     val colors = LauncherTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
@@ -192,5 +235,18 @@ private fun AppRowItem(app: AppInfo, onLaunch: () -> Unit) {
             style = MaterialTheme.typography.labelSmall,
             color = colors.primaryDim
         )
+    }
+}
+
+private fun timeAgo(ts: Long): String {
+    val diffMs = System.currentTimeMillis() - ts
+    val minutes = diffMs / 60_000
+    val hours   = diffMs / 3_600_000
+    val days    = diffMs / 86_400_000
+    return when {
+        minutes < 1  -> "just now"
+        hours   < 1  -> "${minutes}m ago"
+        days    < 1  -> "${hours}h ago"
+        else         -> "${days}d ago"
     }
 }

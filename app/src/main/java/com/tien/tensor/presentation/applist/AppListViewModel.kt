@@ -5,15 +5,18 @@ import androidx.lifecycle.viewModelScope
 import com.tien.tensor.domain.usecase.GetInstalledAppsUseCase
 import com.tien.tensor.domain.usecase.LaunchAppUseCase
 import com.tien.tensor.domain.usecase.SearchAppsUseCase
+import com.tien.tensor.domain.usecase.TrackAppLaunchUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class AppListViewModel(
     getInstalledAppsUseCase: GetInstalledAppsUseCase,
     private val searchAppsUseCase: SearchAppsUseCase,
-    private val launchAppUseCase: LaunchAppUseCase
+    private val launchAppUseCase: LaunchAppUseCase,
+    private val trackAppLaunchUseCase: TrackAppLaunchUseCase
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -32,5 +35,10 @@ class AppListViewModel(
 
     fun onSearchQueryChanged(query: String) { _searchQuery.value = query }
 
-    fun onAppLaunch(packageName: String) { launchAppUseCase(packageName) }
+    fun onAppLaunch(packageName: String) {
+        viewModelScope.launch {
+            launchAppUseCase(packageName)
+            trackAppLaunchUseCase(packageName)
+        }
+    }
 }

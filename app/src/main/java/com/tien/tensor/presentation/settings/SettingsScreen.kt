@@ -78,6 +78,28 @@ fun SettingsScreen(
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
+        TerminalSectionLabel(label = "USAGE DATA")
+        Spacer(Modifier.height(TensorSpacing.sm))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Launch history (RECENT)",
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onBackground,
+                modifier = Modifier.weight(1f)
+            )
+            TerminalButton(
+                label = if (state.historyCleared) "CLEARED" else "CLEAR HISTORY",
+                onClick = { if (!state.historyCleared) viewModel.onClearHistory() }
+            )
+        }
+
+        TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
+
         TerminalSectionLabel(label = "SYSTEM INFO")
         Spacer(Modifier.height(TensorSpacing.sm))
 
