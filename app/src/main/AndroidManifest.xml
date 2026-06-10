@@ -23,11 +23,20 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@style/Theme.Tensor">
+
+            <!-- Registers a launch icon in the current home screen's app drawer -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Registers this activity as a candidate home screen replacement -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
         </activity>
 
         <receiver
