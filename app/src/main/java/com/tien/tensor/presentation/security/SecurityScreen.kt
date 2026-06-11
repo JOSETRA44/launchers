@@ -38,6 +38,7 @@ private val PASSWORD_LENGTHS = listOf(12, 16, 24, 32)
 @Composable
 fun SecurityScreen(
     onNavigateBack: () -> Unit,
+    onOpenArsenal: () -> Unit = {},
     viewModel: SecurityViewModel = viewModel(factory = AppModule.securityViewModelFactory())
 ) {
     val state  by viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,6 +59,11 @@ fun SecurityScreen(
             TerminalPromptHeader(path = "security")
             TerminalButton(label = "BACK", onClick = onNavigateBack)
         }
+
+        TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
+
+        // Gateway to the modular security arsenal (/arsenal)
+        TerminalButton(label = "▸ OPEN SECURITY ARSENAL", onClick = onOpenArsenal, modifier = Modifier.fillMaxWidth())
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 

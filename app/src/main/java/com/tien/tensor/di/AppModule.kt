@@ -26,9 +26,15 @@ import com.tien.tensor.data.source.PreferencesDataSource
 import com.tien.tensor.data.source.SecurityDataSource
 import com.tien.tensor.data.source.StepCounterDataSource
 import com.tien.tensor.data.source.SystemStatusDataSource
+import com.tien.tensor.data.arsenal.AppRiskModule
+import com.tien.tensor.data.arsenal.ArsenalRegistryImpl
+import com.tien.tensor.data.arsenal.DeviceIntegrityModule
+import com.tien.tensor.data.arsenal.NetworkIntelModule
+import com.tien.tensor.data.arsenal.RuntimeTelemetryModule
 import com.tien.tensor.data.source.UsageStatsDataSource
 import com.tien.tensor.domain.port.AppInfoLauncher
 import com.tien.tensor.domain.port.AppLauncher
+import com.tien.tensor.domain.port.ArsenalRegistry
 import com.tien.tensor.domain.port.AppRepository
 import com.tien.tensor.domain.port.AppUsageRepository
 import com.tien.tensor.domain.port.FolderRepository
@@ -45,6 +51,8 @@ import com.tien.tensor.domain.usecase.ClearHistoryUseCase
 import com.tien.tensor.domain.usecase.CreateFolderUseCase
 import com.tien.tensor.domain.usecase.DeleteFolderUseCase
 import com.tien.tensor.domain.usecase.GeneratePasswordUseCase
+import com.tien.tensor.domain.usecase.GetArsenalModulesUseCase
+import com.tien.tensor.domain.usecase.ObserveArsenalModuleUseCase
 import com.tien.tensor.domain.usecase.GetFoldersUseCase
 import com.tien.tensor.domain.usecase.GetInstalledAppsUseCase
 import com.tien.tensor.domain.usecase.GetNotificationCountsUseCase
@@ -65,6 +73,7 @@ import com.tien.tensor.domain.usecase.SetThemeUseCase
 import com.tien.tensor.domain.usecase.TrackAppLaunchUseCase
 import com.tien.tensor.domain.usecase.UnpinAppUseCase
 import com.tien.tensor.presentation.applist.AppListViewModel
+import com.tien.tensor.presentation.arsenal.ArsenalViewModel
 import com.tien.tensor.presentation.insights.InsightsViewModel
 import com.tien.tensor.presentation.launcher.LauncherViewModel
 import com.tien.tensor.presentation.security.SecurityViewModel
@@ -117,6 +126,18 @@ object AppModule {
     private val usageStatsRepository: UsageStatsRepository     by lazy { UsageStatsRepositoryImpl(usageStatsDataSource) }
     private val stepCounterRepository: StepCounterRepository   by lazy { StepCounterRepositoryImpl(stepCounterDataSource) }
 
+    // Security Arsenal plugin registry — add new SecurityModule implementations here
+    private val arsenalRegistry: ArsenalRegistry by lazy {
+        ArsenalRegistryImpl(
+            listOf(
+                DeviceIntegrityModule(appContext),
+                AppRiskModule(appContext),
+                NetworkIntelModule(appContext),
+                RuntimeTelemetryModule(appContext)
+            )
+        )
+    }
+
     // ── Ports ─────────────────────────────────────────────────────────────────
 
     private val appLauncher: AppLauncher             by lazy { AndroidAppLauncher(appContext) }
@@ -149,6 +170,8 @@ object AppModule {
     private val hashTextUseCase           by lazy { HashTextUseCase() }
     private val getUsageStatsUseCase      by lazy { GetUsageStatsUseCase(usageStatsRepository) }
     private val getStepsUseCase           by lazy { GetStepsUseCase(stepCounterRepository) }
+    private val getArsenalModulesUseCase  by lazy { GetArsenalModulesUseCase(arsenalRegistry) }
+    private val observeArsenalModuleUseCase by lazy { ObserveArsenalModuleUseCase(arsenalRegistry) }
 
     // ── ViewModel Factories ───────────────────────────────────────────────────
 
@@ -195,6 +218,10 @@ object AppModule {
 
     fun statusBarViewModelFactory() = factory {
         StatusBarViewModel(getSystemStatusUseCase)
+    }
+
+    fun arsenalViewModelFactory() = factory {
+        ArsenalViewModel(getArsenalModulesUseCase, observeArsenalModuleUseCase)
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -201,6 +201,7 @@ class LauncherViewModel(
             CommandAction.OpenAppList   -> { viewModelScope.launch { _navEvents.emit(AppDestination.APP_LIST) }; showOutput("> Opening apps...") }
             CommandAction.OpenSecurity  -> { viewModelScope.launch { _navEvents.emit(AppDestination.SECURITY) }; showOutput("> Opening security toolkit...") }
             CommandAction.OpenInsights  -> { viewModelScope.launch { _navEvents.emit(AppDestination.INSIGHTS) }; showOutput("> Opening insights...") }
+            CommandAction.OpenArsenal   -> { viewModelScope.launch { _navEvents.emit(AppDestination.ARSENAL) }; showOutput("> Deploying security arsenal...") }
             is CommandAction.Unknown    -> showOutput("> Unknown: \"${action.input}\". Type /help.")
         }
     }

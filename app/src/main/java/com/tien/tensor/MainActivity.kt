@@ -23,6 +23,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tien.tensor.di.AppModule
 import com.tien.tensor.presentation.applist.AppListScreen
+import com.tien.tensor.presentation.arsenal.ArsenalScreen
 import com.tien.tensor.presentation.boot.BootScreen
 import com.tien.tensor.presentation.insights.InsightsScreen
 import com.tien.tensor.presentation.launcher.LauncherScreen
@@ -95,7 +96,12 @@ class MainActivity : ComponentActivity() {
                                         viewModel      = settingsViewModel
                                     )
                                 AppDestination.SECURITY ->
-                                    SecurityScreen(onNavigateBack = { destination = AppDestination.HOME })
+                                    SecurityScreen(
+                                        onNavigateBack = { destination = AppDestination.HOME },
+                                        onOpenArsenal  = { destination = AppDestination.ARSENAL }
+                                    )
+                                AppDestination.ARSENAL ->
+                                    ArsenalScreen(onNavigateBack = { destination = AppDestination.HOME })
                                 AppDestination.INSIGHTS ->
                                     InsightsScreen(onNavigateBack = { destination = AppDestination.HOME })
                             }

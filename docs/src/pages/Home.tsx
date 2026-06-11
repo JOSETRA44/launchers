@@ -1,5 +1,6 @@
 import { Terminal, Shield, Zap, Activity, FolderGit2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { TerminalSimulator } from '../components/terminal/TerminalSimulator';
 
 const Home = () => {
   return (
@@ -27,26 +28,8 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Hero Terminal Simulator Mock */}
-        <div className="bg-surface border border-border rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.8)] overflow-hidden font-mono text-sm h-[350px] flex flex-col relative">
-          <div className="bg-surface-variant px-4 py-2 flex items-center justify-between border-b border-border">
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            </div>
-            <div className="text-on-surface text-xs">guest@tensor:~</div>
-            <div className="w-12"></div>
-          </div>
-          <div className="p-4 flex flex-col gap-2 text-primary flex-grow">
-            <div>Tensor CLI Core [Version 1.0.4]</div>
-            <div>System online. Ready to execute directives.</div>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-prompt">guest@tensor:~$</span>
-              <span className="animate-pulse">_</span>
-            </div>
-          </div>
-        </div>
+        {/* Interactive Hero Terminal Simulator */}
+        <TerminalSimulator />
       </section>
 
       {/* Bento Grid Features */}

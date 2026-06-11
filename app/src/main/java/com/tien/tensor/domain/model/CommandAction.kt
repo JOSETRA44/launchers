@@ -19,5 +19,6 @@ sealed class CommandAction {
     data object OpenAppList : CommandAction()
     data object OpenSecurity : CommandAction()
     data object OpenInsights : CommandAction()
+    data object OpenArsenal : CommandAction()
     data class Unknown(val input: String) : CommandAction()
 }
