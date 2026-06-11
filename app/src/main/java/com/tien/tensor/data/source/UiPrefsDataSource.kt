@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.tien.tensor.domain.model.BarSize
 import com.tien.tensor.domain.model.UiPrefs
@@ -20,6 +21,9 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
     private val fontScaleKey = floatPreferencesKey("ui_font_scale")
     private val clock24Key   = booleanPreferencesKey("ui_clock_24h")
     private val secondsKey   = booleanPreferencesKey("ui_clock_seconds")
+    private val marginTopKey    = intPreferencesKey("ui_margin_top")
+    private val marginBottomKey = intPreferencesKey("ui_margin_bottom")
+    private val languageKey     = stringPreferencesKey("ui_language")
 
     val prefs: Flow<UiPrefs> = dataStore.data
         .catch { emit(emptyPreferences()) }
@@ -28,7 +32,10 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
                 statusBarSize    = runCatching { BarSize.valueOf(p[barSizeKey] ?: "") }.getOrDefault(BarSize.NORMAL),
                 fontScale        = p[fontScaleKey] ?: 1.0f,
                 use24hClock      = p[clock24Key] ?: true,
-                showClockSeconds = p[secondsKey] ?: true
+                showClockSeconds = p[secondsKey] ?: true,
+                marginTopDp      = (p[marginTopKey] ?: 0).coerceIn(0, UiPrefs.MARGIN_MAX_DP),
+                marginBottomDp   = (p[marginBottomKey] ?: 0).coerceIn(0, UiPrefs.MARGIN_MAX_DP),
+                language         = p[languageKey] ?: UiPrefs.LANG_SYSTEM
             )
         }
 
@@ -38,6 +45,9 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
             p[fontScaleKey] = prefs.fontScale
             p[clock24Key]   = prefs.use24hClock
             p[secondsKey]   = prefs.showClockSeconds
+            p[marginTopKey]    = prefs.marginTopDp.coerceIn(0, UiPrefs.MARGIN_MAX_DP)
+            p[marginBottomKey] = prefs.marginBottomDp.coerceIn(0, UiPrefs.MARGIN_MAX_DP)
+            p[languageKey]     = prefs.language
         }
     }
 }

@@ -28,6 +28,8 @@ class ParseCommandUseCase {
             "bar"                     -> parseBarSize(arg)
             "font"                    -> parseFontScale(arg)
             "clock"                   -> parseClock(arg)
+            "margin"                  -> parseMargin(arg)
+            "lang", "language"        -> parseLanguage(arg)
             // Folder commands
             "mkdir"                   -> arg.ifBlank { null }?.let { CommandAction.CreateFolder(it) }
             "rmdir"                   -> arg.ifBlank { null }?.let { CommandAction.DeleteFolder(it) }
@@ -73,6 +75,28 @@ class ParseCommandUseCase {
         "12", "12h" -> CommandAction.SetClockFormat(use24h = false)
         "24", "24h" -> CommandAction.SetClockFormat(use24h = true)
         else         -> CommandAction.Unknown("clock $arg")
+    }
+
+    /** `/margin <t|b> <dp>` — manual safety margin against physical screen edges. */
+    private fun parseMargin(arg: String): CommandAction {
+        val parts = arg.trim().split("\\s+".toRegex())
+        if (parts.size != 2) return CommandAction.Unknown("margin $arg")
+        val top = when (parts[0].lowercase()) {
+            "t", "top"    -> true
+            "b", "bottom" -> false
+            else           -> return CommandAction.Unknown("margin $arg")
+        }
+        val dp = parts[1].toIntOrNull() ?: return CommandAction.Unknown("margin $arg")
+        return CommandAction.SetMargin(top, dp.coerceIn(0, UiPrefs.MARGIN_MAX_DP))
+    }
+
+    private fun parseLanguage(arg: String): CommandAction {
+        val tag = when (arg.trim().lowercase()) {
+            "sys", "system", "auto" -> UiPrefs.LANG_SYSTEM
+            in UiPrefs.LANGUAGES    -> arg.trim().lowercase()
+            else                     -> return CommandAction.Unknown("lang $arg")
+        }
+        return CommandAction.SetLanguage(tag)
     }
 
     private fun parseGroup(arg: String): CommandAction? {

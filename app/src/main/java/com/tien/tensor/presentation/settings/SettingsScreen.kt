@@ -27,7 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tien.tensor.R
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -69,13 +71,13 @@ fun SettingsScreen(
 
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             TerminalPromptHeader(path = "settings")
-            TerminalButton(label = "BACK", onClick = onNavigateBack)
+            TerminalButton(label = stringResource(R.string.common_back), onClick = onNavigateBack)
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // Theme section
-        TerminalSectionLabel(label = "THEME")
+        TerminalSectionLabel(label = stringResource(R.string.settings_theme))
         Spacer(Modifier.height(TensorSpacing.sm))
         state.availableThemes.forEach { theme ->
             ThemeOptionRow(theme = theme, isSelected = theme.id == state.selectedThemeId, onSelect = { viewModel.onThemeSelected(theme.id) })
@@ -85,10 +87,10 @@ fun SettingsScreen(
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // Display customization section
-        TerminalSectionLabel(label = "DISPLAY")
+        TerminalSectionLabel(label = stringResource(R.string.settings_display))
         Spacer(Modifier.height(TensorSpacing.sm))
 
-        OptionGroupRow(label = "STATUS BAR") {
+        OptionGroupRow(label = stringResource(R.string.settings_status_bar)) {
             BarSize.entries.forEach { size ->
                 TerminalButton(
                     label   = size.displayName,
@@ -98,7 +100,7 @@ fun SettingsScreen(
             }
         }
         Spacer(Modifier.height(TensorSpacing.xs))
-        OptionGroupRow(label = "FONT SIZE") {
+        OptionGroupRow(label = stringResource(R.string.settings_font_size)) {
             UiPrefs.FONT_SCALES.forEach { scale ->
                 TerminalButton(
                     label   = "${(scale * 100).toInt()}%",
@@ -108,7 +110,7 @@ fun SettingsScreen(
             }
         }
         Spacer(Modifier.height(TensorSpacing.xs))
-        OptionGroupRow(label = "CLOCK") {
+        OptionGroupRow(label = stringResource(R.string.settings_clock)) {
             TerminalButton(label = "12H", active = !state.uiPrefs.use24hClock, onClick = { viewModel.onClockFormatSelected(false) })
             TerminalButton(label = "24H", active = state.uiPrefs.use24hClock,  onClick = { viewModel.onClockFormatSelected(true) })
             TerminalButton(
@@ -120,13 +122,52 @@ fun SettingsScreen(
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
+        // Spatial customization: manual safety margins against physical edges
+        TerminalSectionLabel(label = stringResource(R.string.settings_spacing))
+        Spacer(Modifier.height(TensorSpacing.xs))
+        Text(
+            text  = stringResource(R.string.settings_spacing_hint),
+            style = MaterialTheme.typography.labelSmall,
+            color = colors.onSurface
+        )
+        Spacer(Modifier.height(TensorSpacing.sm))
+        MarginStepperRow(
+            label   = stringResource(R.string.settings_margin_top),
+            valueDp = state.uiPrefs.marginTopDp,
+            onStep  = { increase -> viewModel.onMarginStepped(top = true, increase = increase) }
+        )
+        Spacer(Modifier.height(TensorSpacing.xs))
+        MarginStepperRow(
+            label   = stringResource(R.string.settings_margin_bottom),
+            valueDp = state.uiPrefs.marginBottomDp,
+            onStep  = { increase -> viewModel.onMarginStepped(top = false, increase = increase) }
+        )
+
+        TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
+
+        // Language section — UI labels only; terminal commands stay locale-agnostic
+        TerminalSectionLabel(label = stringResource(R.string.settings_language))
+        Spacer(Modifier.height(TensorSpacing.sm))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
+            TerminalButton(
+                label   = stringResource(R.string.settings_lang_system),
+                active  = state.uiPrefs.language == UiPrefs.LANG_SYSTEM,
+                onClick = { viewModel.onLanguageSelected(UiPrefs.LANG_SYSTEM) },
+                modifier = Modifier.weight(1f)
+            )
+            TerminalButton(label = "EN", active = state.uiPrefs.language == "en", onClick = { viewModel.onLanguageSelected("en") }, modifier = Modifier.weight(1f))
+            TerminalButton(label = "ES", active = state.uiPrefs.language == "es", onClick = { viewModel.onLanguageSelected("es") }, modifier = Modifier.weight(1f))
+        }
+
+        TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
+
         // Usage data section
-        TerminalSectionLabel(label = "USAGE DATA")
+        TerminalSectionLabel(label = stringResource(R.string.settings_usage_data))
         Spacer(Modifier.height(TensorSpacing.sm))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = "Launch history (RECENT)", style = MaterialTheme.typography.bodySmall, color = colors.onBackground, modifier = Modifier.weight(1f))
+            Text(text = stringResource(R.string.settings_launch_history), style = MaterialTheme.typography.bodySmall, color = colors.onBackground, modifier = Modifier.weight(1f))
             TerminalButton(
-                label   = if (state.historyCleared) "CLEARED" else "CLEAR HISTORY",
+                label   = if (state.historyCleared) stringResource(R.string.settings_cleared) else stringResource(R.string.settings_clear_history),
                 onClick = { if (!state.historyCleared) viewModel.onClearHistory() }
             )
         }
@@ -134,20 +175,20 @@ fun SettingsScreen(
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // Notifications section
-        TerminalSectionLabel(label = "NOTIFICATIONS")
+        TerminalSectionLabel(label = stringResource(R.string.settings_notifications))
         Spacer(Modifier.height(TensorSpacing.sm))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "Notification badges", style = MaterialTheme.typography.bodySmall, color = colors.onBackground)
+                Text(text = stringResource(R.string.settings_notif_badges), style = MaterialTheme.typography.bodySmall, color = colors.onBackground)
                 Text(
-                    text  = if (notifEnabled) "ENABLED" else "DISABLED",
+                    text  = if (notifEnabled) stringResource(R.string.settings_enabled) else stringResource(R.string.settings_disabled),
                     style = MaterialTheme.typography.labelSmall,
                     color = if (notifEnabled) colors.primary else colors.error
                 )
             }
             if (!notifEnabled) {
                 TerminalButton(
-                    label   = "GRANT ACCESS",
+                    label   = stringResource(R.string.settings_grant_access),
                     onClick = {
                         val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -160,7 +201,7 @@ fun SettingsScreen(
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // System info section
-        TerminalSectionLabel(label = "SYSTEM INFO")
+        TerminalSectionLabel(label = stringResource(R.string.settings_system_info))
         Spacer(Modifier.height(TensorSpacing.sm))
         SystemInfoRow(key = "OS",       value = "Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
         SystemInfoRow(key = "DEVICE",   value = "${Build.MANUFACTURER} ${Build.MODEL}".uppercase())
@@ -168,6 +209,31 @@ fun SettingsScreen(
         SystemInfoRow(key = "LAUNCHER", value = "TENSOR OS v1.0.0")
 
         Spacer(Modifier.height(TensorSpacing.md))
+    }
+}
+
+/** Stepper with a live block gauge: `TOP MARGIN  [-] ▓▓░░░░░░ 16 [+]`. */
+@Composable
+private fun MarginStepperRow(label: String, valueDp: Int, onStep: (increase: Boolean) -> Unit) {
+    val colors = LauncherTheme.colors
+    val cells  = UiPrefs.MARGIN_MAX_DP / 8
+    val filled = (valueDp + 7) / 8
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(text = label, style = MaterialTheme.typography.labelMedium, color = colors.terminalPrompt, modifier = Modifier.weight(1f))
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
+            TerminalButton(label = "−", onClick = { onStep(false) })
+            Text(
+                text  = "█".repeat(filled) + "·".repeat(cells - filled),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.primaryDim
+            )
+            Text(
+                text  = "${valueDp}dp".padStart(4),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.onBackground
+            )
+            TerminalButton(label = "+", onClick = { onStep(true) })
+        }
     }
 }
 
@@ -195,7 +261,7 @@ private fun ThemeOptionRow(theme: ThemeConfig, isSelected: Boolean, onSelect: ()
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = if (isSelected) "> ${theme.name}" else "  ${theme.name}", style = MaterialTheme.typography.bodyMedium, color = if (isSelected) colors.primary else colors.onBackground)
-        if (isSelected) Text(text = "[ACTIVE]", style = MaterialTheme.typography.labelSmall, color = colors.primary)
+        if (isSelected) Text(text = stringResource(R.string.settings_active), style = MaterialTheme.typography.labelSmall, color = colors.primary)
     }
 }
 

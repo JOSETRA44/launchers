@@ -1,8 +1,11 @@
-import { Terminal, Shield, Zap, Activity, FolderGit2 } from 'lucide-react';
+import { Terminal, Shield, Zap, Activity, FolderGit2, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { TerminalSimulator } from '../components/terminal/TerminalSimulator';
+import { useLanguage } from '../components/LanguageContext';
 
 const Home = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="py-12 flex flex-col gap-24">
       {/* Hero Section */}
@@ -10,20 +13,22 @@ const Home = () => {
         <div className="flex flex-col gap-6">
           <div className="font-mono text-primary text-sm tracking-widest flex items-center gap-2 uppercase">
             <span className="w-2 h-2 bg-primary animate-pulse rounded-full"></span>
-            CLI Home-Screen Shell
+            {t('hero_tag')}
           </div>
           <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-            Control Android <br /> Through <span className="text-primary drop-shadow-[0_0_10px_rgba(0,255,65,0.4)]">Tensor</span>
+            {t('hero_title').split('Tensor')[0]}
+            <span className="text-primary drop-shadow-[0_0_10px_rgba(0,255,65,0.4)]">Tensor</span>
+            {t('hero_title').split('Tensor')[1]}
           </h1>
           <p className="text-on-background text-lg max-w-lg">
-            Tensor is a terminal-driven home screen engineered for developers and power users. Built from the ground up using Jetpack Compose, Material3, and strict DDD Clean Architecture.
+            {t('hero_desc')}
           </p>
           <div className="flex flex-wrap gap-4 mt-4">
             <button className="bg-primary text-black font-mono px-6 py-3 rounded font-semibold hover:bg-cursor transition-colors shadow-[0_4px_14px_rgba(0,255,65,0.15)] hover:shadow-[0_6px_20px_rgba(0,255,65,0.35)] flex items-center gap-2">
-              <Terminal size={18} /> OPEN TERMINAL
+              <Terminal size={18} /> {t('btn_terminal')}
             </button>
             <button className="border border-border text-primary font-mono px-6 py-3 rounded hover:bg-primary/10 transition-colors flex items-center gap-2">
-              <FolderGit2 size={18} /> GITHUB
+              <FolderGit2 size={18} /> {t('btn_github')}
             </button>
           </div>
         </div>
@@ -35,8 +40,8 @@ const Home = () => {
       {/* Bento Grid Features */}
       <section className="flex flex-col gap-8">
         <div className="text-center max-w-2xl mx-auto mb-8">
-          <h2 className="text-3xl font-bold mb-4">Engineered For Power Users</h2>
-          <p className="text-on-surface">Designed with deep system integrations, efficient fuzzy matching engines, and defensive tools to audit your Android environment directly.</p>
+          <h2 className="text-3xl font-bold mb-4">{t('engineered')}</h2>
+          <p className="text-on-surface">{t('engineered_desc')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -71,6 +76,24 @@ const Home = () => {
             <h3 className="text-xl font-bold text-white mb-2">Security Toolkit</h3>
             <p className="text-on-background">Check security flags such as active screen locks, adb configurations, dev mode state, and su root binaries. Includes a secure passphrase generator with custom character classes avoiding ambiguous glyphs.</p>
           </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="flex flex-col gap-8">
+        <div className="flex items-center gap-3 mb-4 border-b border-border pb-4">
+          <HelpCircle className="text-primary" size={28} />
+          <h2 className="text-3xl font-bold">{t('faq_title')}</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-surface border border-border p-6 rounded-lg shadow-lg hover:border-primary transition-colors">
+            <h3 className="text-xl font-bold text-white mb-2">{t('faq_1_q')}</h3>
+            <p className="text-on-background leading-relaxed">{t('faq_1_a')}</p>
+          </div>
+          <div className="bg-surface border border-border p-6 rounded-lg shadow-lg hover:border-primary transition-colors">
+            <h3 className="text-xl font-bold text-white mb-2">{t('faq_2_q')}</h3>
+            <p className="text-on-background leading-relaxed">{t('faq_2_a')}</p>
+          </div>
         </div>
       </section>
     </div>

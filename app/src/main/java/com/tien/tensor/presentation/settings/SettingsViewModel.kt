@@ -51,6 +51,14 @@ class SettingsViewModel(
     fun onFontScaleSelected(scale: Float)  = updatePrefs { it.copy(fontScale = scale) }
     fun onClockFormatSelected(use24h: Boolean) = updatePrefs { it.copy(use24hClock = use24h) }
     fun onToggleClockSeconds()             = updatePrefs { it.copy(showClockSeconds = !it.showClockSeconds) }
+    fun onLanguageSelected(tag: String)    = updatePrefs { it.copy(language = tag) }
+
+    /** Steps a physical-edge safety margin by ±[UiPrefs.MARGIN_STEP_DP]; applied live. */
+    fun onMarginStepped(top: Boolean, increase: Boolean) = updatePrefs {
+        val delta = if (increase) UiPrefs.MARGIN_STEP_DP else -UiPrefs.MARGIN_STEP_DP
+        if (top) it.copy(marginTopDp = (it.marginTopDp + delta).coerceIn(0, UiPrefs.MARGIN_MAX_DP))
+        else     it.copy(marginBottomDp = (it.marginBottomDp + delta).coerceIn(0, UiPrefs.MARGIN_MAX_DP))
+    }
 
     private fun updatePrefs(transform: (UiPrefs) -> UiPrefs) {
         viewModelScope.launch { updateUiPrefsUseCase(transform(_state.value.uiPrefs)) }

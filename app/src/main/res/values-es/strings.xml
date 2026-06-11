@@ -1,0 +1,100 @@
+<resources>
+    <string name="app_name">tensor</string>
+
+    <!-- Común -->
+    <string name="common_back">ATRÁS</string>
+    <string name="common_close">CERRAR</string>
+    <string name="common_rescan">REESCANEAR</string>
+
+    <!-- Inicio -->
+    <string name="home_recent">RECIENTES</string>
+    <string name="home_apps">APPS</string>
+    <string name="home_results">RESULTADOS (%1$d)</string>
+    <string name="home_folders">CARPETAS</string>
+    <string name="home_dock">DOCK</string>
+    <string name="home_launching">> ABRIENDO %1$s…</string>
+
+    <!-- Pantalla de carga -->
+    <string name="charging_title">>> CARGANDO &lt;&lt;</string>
+    <string name="charging_tap_dismiss">[ TOCA PARA CERRAR ]</string>
+
+    <!-- Ayuda -->
+    <string name="help_title">REFERENCIA DE COMANDOS</string>
+    <string name="help_swipe_hint">Desliza hacia arriba en la cabecera para abrir el cajón de apps.</string>
+    <string name="help_g">Búsqueda web</string>
+    <string name="help_open">Abrir app por nombre</string>
+    <string name="help_info">Información de sistema de la app</string>
+    <string name="help_pin">Anclar app al dock</string>
+    <string name="help_unpin">Quitar app del dock</string>
+    <string name="help_theme">Cambiar tema: dark / cyan / matrix / amber / red / ice</string>
+    <string name="help_mkdir">Crear una carpeta</string>
+    <string name="help_group">Añadir app a una carpeta</string>
+    <string name="help_rmdir">Eliminar una carpeta</string>
+    <string name="help_folder">Abrir carpeta</string>
+    <string name="help_bar">Tamaño de la barra de estado</string>
+    <string name="help_font">Escala de fuente (90–125)</string>
+    <string name="help_clock">Formato del reloj</string>
+    <string name="help_margin">Margen de seguridad en dp (bordes físicos)</string>
+    <string name="help_lang">Idioma: en / es / system</string>
+    <string name="help_settings">Abrir ajustes</string>
+    <string name="help_apps">Abrir lista de apps</string>
+    <string name="help_sec">Herramientas de seguridad y auditoría</string>
+    <string name="help_arsenal">Arsenal de seguridad — auditorías modulares</string>
+    <string name="help_stats">Tiempo de pantalla y pasos</string>
+    <string name="help_clean">Borrar historial de apertura</string>
+    <string name="help_help">Mostrar esta referencia</string>
+
+    <!-- Ajustes -->
+    <string name="settings_theme">TEMA</string>
+    <string name="settings_active">[ACTIVO]</string>
+    <string name="settings_display">PANTALLA</string>
+    <string name="settings_status_bar">BARRA DE ESTADO</string>
+    <string name="settings_font_size">TAMAÑO DE FUENTE</string>
+    <string name="settings_clock">RELOJ</string>
+    <string name="settings_spacing">ESPACIADO — BORDES FÍSICOS</string>
+    <string name="settings_spacing_hint">Aleja la interfaz de fundas, cristales curvos o protectores. Vista previa en vivo.</string>
+    <string name="settings_margin_top">MARGEN SUPERIOR</string>
+    <string name="settings_margin_bottom">MARGEN INFERIOR</string>
+    <string name="settings_language">IDIOMA</string>
+    <string name="settings_lang_system">SISTEMA</string>
+    <string name="settings_usage_data">DATOS DE USO</string>
+    <string name="settings_launch_history">Historial de apertura (RECIENTES)</string>
+    <string name="settings_clear_history">BORRAR HISTORIAL</string>
+    <string name="settings_cleared">BORRADO</string>
+    <string name="settings_notifications">NOTIFICACIONES</string>
+    <string name="settings_notif_badges">Indicadores de notificación</string>
+    <string name="settings_enabled">ACTIVADO</string>
+    <string name="settings_disabled">DESACTIVADO</string>
+    <string name="settings_grant_access">CONCEDER ACCESO</string>
+    <string name="settings_system_info">INFO DEL SISTEMA</string>
+
+    <!-- Insights -->
+    <string name="insights_screen_time">TIEMPO DE PANTALLA — HOY</string>
+    <string name="insights_usage_rationale">Se necesita acceso de uso para mostrar dónde pasa tu tiempo.</string>
+    <string name="insights_grant_usage">CONCEDER ACCESO DE USO</string>
+    <string name="insights_total">TOTAL: %1$s</string>
+    <string name="insights_no_usage">Aún no hay uso registrado hoy.</string>
+    <string name="insights_steps">PASOS — HOY</string>
+    <string name="insights_steps_rationale">Se necesita el permiso de actividad física para contar pasos.</string>
+    <string name="insights_grant_activity">CONCEDER ACCESO DE ACTIVIDAD</string>
+    <string name="insights_no_sensor">Este dispositivo no tiene sensor de pasos.</string>
+    <string name="insights_steps_since_midnight">pasos desde medianoche</string>
+
+    <!-- Seguridad -->
+    <string name="security_device_audit">AUDITORÍA DEL DISPOSITIVO</string>
+    <string name="security_password_generator">GENERADOR DE CONTRASEÑAS</string>
+    <string name="security_hash_tool">HERRAMIENTA HASH</string>
+    <string name="security_generate">GENERAR</string>
+    <string name="security_copy_hint">Mantén pulsado para copiar</string>
+    <string name="security_open_arsenal">▸ ABRIR ARSENAL DE SEGURIDAD</string>
+
+    <!-- Arsenal -->
+    <string name="arsenal_subtitle">MÓDULOS DEFENSIVOS · SOLO LOCAL · SOLO LECTURA</string>
+    <string name="arsenal_live">● EN VIVO</string>
+    <string name="arsenal_modules_back">&lt; MÓDULOS</string>
+    <string name="arsenal_scanning">ESCANEANDO…</string>
+    <string name="arsenal_running">> ejecutando análisis…</string>
+    <string name="arsenal_no_data">> sin datos.</string>
+    <string name="arsenal_badge_clean">[LIMPIO]</string>
+    <string name="arsenal_badge_scanning">[ESCANEANDO]</string>
+</resources>

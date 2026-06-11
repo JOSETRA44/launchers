@@ -17,11 +17,14 @@ export const TerminalSimulator = () => {
   ]);
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const terminalBodyRef = useRef<HTMLDivElement>(null);
   const { setTheme } = useTheme();
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (terminalBodyRef.current) {
+      // FIX: Scroll only the terminal's internal container, not the whole window
+      terminalBodyRef.current.scrollTop = terminalBodyRef.current.scrollHeight;
+    }
   }, [lines]);
 
   const addLine = (text: string, isHtml = false, className = '') => {
@@ -34,9 +37,15 @@ export const TerminalSimulator = () => {
 
     addLine(`<span class="text-prompt">guest@tensor:~$</span> ${trimmed}`, true);
     
-    // FIX: Handle multiple spaces seamlessly
+    // FIX: Handle multiple spaces seamlessly and auto-prefix missing slashes
     const parts = trimmed.split(/\s+/);
-    const mainCmd = parts[0].toLowerCase();
+    let rawCmd = parts[0].toLowerCase();
+    
+    if (!rawCmd.startsWith('/') && ['theme', 'sec', 'stats', 'genpass', 'help', 'clean', 'cls', '?'].includes(rawCmd)) {
+      rawCmd = '/' + rawCmd;
+    }
+    
+    const mainCmd = rawCmd;
     const args = parts.slice(1);
 
     switch (mainCmd) {
@@ -99,7 +108,7 @@ export const TerminalSimulator = () => {
     }
   };
 
-  const chips = ['/help', '/sec', '/stats', '/theme matrix', '/genpass 24'];
+  const chips = ['/help', '/sec', '/stats', '/theme cyan', '/theme dark', '/theme matrix', '/genpass 24'];
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -122,7 +131,7 @@ export const TerminalSimulator = () => {
         </div>
 
         {/* Terminal Body */}
-        <div className="p-4 flex flex-col gap-1 flex-grow overflow-y-auto">
+        <div ref={terminalBodyRef} className="p-4 flex flex-col gap-1 flex-grow overflow-y-auto scroll-smooth">
           <AnimatePresence>
             {lines.map((line) => {
               const motionProps = {
@@ -160,7 +169,6 @@ export const TerminalSimulator = () => {
               ></motion.span>
             </div>
           </div>
-          <div ref={bottomRef} />
         </div>
       </motion.div>
 

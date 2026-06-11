@@ -32,7 +32,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import com.tien.tensor.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tien.tensor.di.AppModule
@@ -151,7 +153,7 @@ fun LauncherScreen(
 
             // App list section
             if (state.searchQuery.isNotBlank()) {
-                TerminalSectionLabel(label = "RESULTS (${state.searchResults.size})")
+                TerminalSectionLabel(label = stringResource(R.string.home_results, state.searchResults.size))
                 Spacer(Modifier.height(TensorSpacing.xs))
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(state.searchResults, key = { it.packageName }) { app ->
@@ -160,7 +162,7 @@ fun LauncherScreen(
                 }
             } else {
                 val showSmart = state.smartApps.isNotEmpty()
-                TerminalSectionLabel(label = if (showSmart) "RECENT" else "APPS")
+                TerminalSectionLabel(label = if (showSmart) stringResource(R.string.home_recent) else stringResource(R.string.home_apps))
                 Spacer(Modifier.height(TensorSpacing.xs))
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     if (showSmart) {
@@ -180,7 +182,7 @@ fun LauncherScreen(
             // Folders
             if (state.folders.isNotEmpty()) {
                 Spacer(Modifier.height(TensorSpacing.xs))
-                TerminalSectionLabel(label = "FOLDERS")
+                TerminalSectionLabel(label = stringResource(R.string.home_folders))
                 Spacer(Modifier.height(TensorSpacing.xs))
                 Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
                     state.folders.forEach { folder ->
@@ -196,7 +198,7 @@ fun LauncherScreen(
             // Dock
             if (state.pinnedApps.isNotEmpty()) {
                 if (state.folders.isEmpty()) Spacer(Modifier.height(TensorSpacing.xs))
-                TerminalSectionLabel(label = "DOCK")
+                TerminalSectionLabel(label = stringResource(R.string.home_dock))
                 Spacer(Modifier.height(TensorSpacing.xs))
                 Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
                     state.pinnedApps.forEach { app ->
@@ -218,7 +220,7 @@ fun LauncherScreen(
         }
 
         AnimatedVisibility(visible = state.launchingAppName != null, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.align(Alignment.BottomCenter)) {
-            Text(text = "> LAUNCHING ${state.launchingAppName?.uppercase()}...", style = MaterialTheme.typography.labelMedium, color = colors.primary,
+            Text(text = stringResource(R.string.home_launching, state.launchingAppName?.uppercase() ?: ""), style = MaterialTheme.typography.labelMedium, color = colors.primary,
                 modifier = Modifier.fillMaxWidth().background(colors.surface).padding(TensorSpacing.md))
         }
     }

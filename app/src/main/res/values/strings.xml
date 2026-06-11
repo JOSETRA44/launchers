@@ -1,3 +1,100 @@
 <resources>
     <string name="app_name">tensor</string>
+
+    <!-- Common -->
+    <string name="common_back">BACK</string>
+    <string name="common_close">CLOSE</string>
+    <string name="common_rescan">RESCAN</string>
+
+    <!-- Home -->
+    <string name="home_recent">RECENT</string>
+    <string name="home_apps">APPS</string>
+    <string name="home_results">RESULTS (%1$d)</string>
+    <string name="home_folders">FOLDERS</string>
+    <string name="home_dock">DOCK</string>
+    <string name="home_launching">> LAUNCHING %1$s…</string>
+
+    <!-- Charging overlay -->
+    <string name="charging_title">>> CHARGING &lt;&lt;</string>
+    <string name="charging_tap_dismiss">[ TAP TO DISMISS ]</string>
+
+    <!-- Help overlay -->
+    <string name="help_title">COMMAND REFERENCE</string>
+    <string name="help_swipe_hint">Swipe up on the header area to open the app drawer.</string>
+    <string name="help_g">Web search</string>
+    <string name="help_open">Launch app by name</string>
+    <string name="help_info">Open system app info</string>
+    <string name="help_pin">Add app to dock</string>
+    <string name="help_unpin">Remove app from dock</string>
+    <string name="help_theme">Switch theme: dark / cyan / matrix / amber / red / ice</string>
+    <string name="help_mkdir">Create a folder</string>
+    <string name="help_group">Add app to folder</string>
+    <string name="help_rmdir">Delete a folder</string>
+    <string name="help_folder">Open folder overlay</string>
+    <string name="help_bar">Status bar size</string>
+    <string name="help_font">Font scale (90–125)</string>
+    <string name="help_clock">Clock format</string>
+    <string name="help_margin">Safety margin in dp (screen edges)</string>
+    <string name="help_lang">Language: en / es / system</string>
+    <string name="help_settings">Open settings</string>
+    <string name="help_apps">Open app list</string>
+    <string name="help_sec">Security toolkit &amp; device audit</string>
+    <string name="help_arsenal">Security arsenal — modular deep audits</string>
+    <string name="help_stats">Screen time &amp; step insights</string>
+    <string name="help_clean">Clear launch history</string>
+    <string name="help_help">Show this reference</string>
+
+    <!-- Settings -->
+    <string name="settings_theme">THEME</string>
+    <string name="settings_active">[ACTIVE]</string>
+    <string name="settings_display">DISPLAY</string>
+    <string name="settings_status_bar">STATUS BAR</string>
+    <string name="settings_font_size">FONT SIZE</string>
+    <string name="settings_clock">CLOCK</string>
+    <string name="settings_spacing">SPACING — PHYSICAL EDGES</string>
+    <string name="settings_spacing_hint">Push the UI away from cases, curved glass or screen protectors. Live preview.</string>
+    <string name="settings_margin_top">TOP MARGIN</string>
+    <string name="settings_margin_bottom">BOTTOM MARGIN</string>
+    <string name="settings_language">LANGUAGE</string>
+    <string name="settings_lang_system">SYSTEM</string>
+    <string name="settings_usage_data">USAGE DATA</string>
+    <string name="settings_launch_history">Launch history (RECENT)</string>
+    <string name="settings_clear_history">CLEAR HISTORY</string>
+    <string name="settings_cleared">CLEARED</string>
+    <string name="settings_notifications">NOTIFICATIONS</string>
+    <string name="settings_notif_badges">Notification badges</string>
+    <string name="settings_enabled">ENABLED</string>
+    <string name="settings_disabled">DISABLED</string>
+    <string name="settings_grant_access">GRANT ACCESS</string>
+    <string name="settings_system_info">SYSTEM INFO</string>
+
+    <!-- Insights -->
+    <string name="insights_screen_time">SCREEN TIME — TODAY</string>
+    <string name="insights_usage_rationale">Usage access is required to show where your time goes.</string>
+    <string name="insights_grant_usage">GRANT USAGE ACCESS</string>
+    <string name="insights_total">TOTAL: %1$s</string>
+    <string name="insights_no_usage">No usage recorded yet today.</string>
+    <string name="insights_steps">STEPS — TODAY</string>
+    <string name="insights_steps_rationale">Physical activity permission is required to count steps.</string>
+    <string name="insights_grant_activity">GRANT ACTIVITY ACCESS</string>
+    <string name="insights_no_sensor">No step sensor on this device.</string>
+    <string name="insights_steps_since_midnight">steps since midnight</string>
+
+    <!-- Security -->
+    <string name="security_device_audit">DEVICE AUDIT</string>
+    <string name="security_password_generator">PASSWORD GENERATOR</string>
+    <string name="security_hash_tool">HASH TOOL</string>
+    <string name="security_generate">GENERATE</string>
+    <string name="security_copy_hint">Long-press to copy</string>
+    <string name="security_open_arsenal">▸ OPEN SECURITY ARSENAL</string>
+
+    <!-- Arsenal -->
+    <string name="arsenal_subtitle">DEFENSIVE MODULES · LOCAL ONLY · READ-ONLY</string>
+    <string name="arsenal_live">● LIVE</string>
+    <string name="arsenal_modules_back">&lt; MODULES</string>
+    <string name="arsenal_scanning">SCANNING…</string>
+    <string name="arsenal_running">> running analysis…</string>
+    <string name="arsenal_no_data">> no data.</string>
+    <string name="arsenal_badge_clean">[CLEAN]</string>
+    <string name="arsenal_badge_scanning">[SCANNING]</string>
 </resources>

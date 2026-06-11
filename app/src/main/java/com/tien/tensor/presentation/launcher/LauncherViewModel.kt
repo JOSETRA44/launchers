@@ -200,6 +200,16 @@ class LauncherViewModel(
             is CommandAction.SetClockFormat -> {
                 viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(use24hClock = action.use24h)); showOutput("> Clock: ${if (action.use24h) "24H" else "12H"}") }
             }
+            is CommandAction.SetMargin -> {
+                viewModelScope.launch {
+                    val updated = if (action.top) uiPrefs.copy(marginTopDp = action.dp) else uiPrefs.copy(marginBottomDp = action.dp)
+                    updateUiPrefsUseCase(updated)
+                    showOutput("> Margin ${if (action.top) "top" else "bottom"}: ${action.dp}dp")
+                }
+            }
+            is CommandAction.SetLanguage -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(language = action.tag)); showOutput("> Language: ${action.tag.uppercase()}") }
+            }
             // Folder commands
             is CommandAction.CreateFolder -> {
                 if (_state.value.folders.any { it.name.equals(action.name, ignoreCase = true) }) { showOutput("> \"${action.name}\" already exists."); return }

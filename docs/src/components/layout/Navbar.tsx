@@ -1,13 +1,15 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Terminal, Star, Clock, Menu } from 'lucide-react';
+import { Terminal, Star, Clock, Menu, Globe } from 'lucide-react';
+import { useLanguage } from '../LanguageContext';
 
 const Navbar = () => {
   const location = useLocation();
+  const { t, lang, setLang } = useLanguage();
 
   const navItems = [
-    { name: 'Home', path: '/', icon: <Terminal size={18} /> },
-    { name: 'Reviews', path: '/resenas', icon: <Star size={18} /> },
-    { name: 'Changelog', path: '/version', icon: <Clock size={18} /> },
+    { name: t('nav_home'), path: '/', icon: <Terminal size={18} /> },
+    { name: t('nav_reviews'), path: '/resenas', icon: <Star size={18} /> },
+    { name: t('nav_changelog'), path: '/version', icon: <Clock size={18} /> },
   ];
 
   return (
@@ -39,6 +41,14 @@ const Navbar = () => {
               </Link>
             );
           })}
+
+          {/* I18n Switcher */}
+          <button 
+            onClick={() => setLang(lang === 'en' ? 'es' : 'en')}
+            className="flex items-center gap-2 text-on-surface hover:text-primary transition-colors border border-border px-3 py-1 rounded"
+          >
+            <Globe size={14} /> {lang.toUpperCase()}
+          </button>
         </div>
 
         {/* Mobile Nav Toggle */}

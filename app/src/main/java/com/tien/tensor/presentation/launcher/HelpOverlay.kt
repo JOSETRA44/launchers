@@ -1,5 +1,6 @@
 package com.tien.tensor.presentation.launcher
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,35 +18,43 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.tien.tensor.R
 import com.tien.tensor.ui.component.TerminalButton
 import com.tien.tensor.ui.component.TerminalDivider
 import com.tien.tensor.ui.component.TerminalSectionLabel
 import com.tien.tensor.ui.theme.LauncherTheme
 import com.tien.tensor.ui.theme.TensorSpacing
 
-private data class CmdEntry(val syntax: String, val description: String)
+/**
+ * Command syntax stays locale-agnostic on purpose — only descriptions are
+ * resolved through resources (values/, values-es/, …).
+ */
+private data class CmdEntry(val syntax: String, @StringRes val descriptionRes: Int)
 
 private val COMMANDS = listOf(
-    CmdEntry("/g <query>",             "Web search"),
-    CmdEntry("/open <app>",            "Launch app by name"),
-    CmdEntry("/info <app>",            "Open system app info"),
-    CmdEntry("/pin <app>",             "Add app to dock"),
-    CmdEntry("/unpin <app>",           "Remove app from dock"),
-    CmdEntry("/theme <name>",          "Switch theme: dark / cyan / matrix"),
-    CmdEntry("/mkdir <name>",          "Create a folder"),
-    CmdEntry("/group <folder> <app>",  "Add app to folder"),
-    CmdEntry("/rmdir <folder>",        "Delete a folder"),
-    CmdEntry("/folder <name>",         "Open folder overlay"),
-    CmdEntry("/bar <s|m|l>",           "Status bar size"),
-    CmdEntry("/font <90..125>",        "Font scale %"),
-    CmdEntry("/clock <12|24>",         "Clock format"),
-    CmdEntry("/settings",              "Open settings"),
-    CmdEntry("/apps",                  "Open app list"),
-    CmdEntry("/sec",                   "Security toolkit & device audit"),
-    CmdEntry("/arsenal",               "Security arsenal — modular deep audits"),
-    CmdEntry("/stats",                 "Screen time & step insights"),
-    CmdEntry("/clean",                 "Clear launch history"),
-    CmdEntry("/help",                  "Show this reference"),
+    CmdEntry("/g <query>",            R.string.help_g),
+    CmdEntry("/open <app>",           R.string.help_open),
+    CmdEntry("/info <app>",           R.string.help_info),
+    CmdEntry("/pin <app>",            R.string.help_pin),
+    CmdEntry("/unpin <app>",          R.string.help_unpin),
+    CmdEntry("/theme <name>",         R.string.help_theme),
+    CmdEntry("/mkdir <name>",         R.string.help_mkdir),
+    CmdEntry("/group <folder> <app>", R.string.help_group),
+    CmdEntry("/rmdir <folder>",       R.string.help_rmdir),
+    CmdEntry("/folder <name>",        R.string.help_folder),
+    CmdEntry("/bar <s|m|l>",          R.string.help_bar),
+    CmdEntry("/font <90..125>",       R.string.help_font),
+    CmdEntry("/clock <12|24>",        R.string.help_clock),
+    CmdEntry("/margin <t|b> <dp>",    R.string.help_margin),
+    CmdEntry("/lang <en|es|sys>",     R.string.help_lang),
+    CmdEntry("/settings",             R.string.help_settings),
+    CmdEntry("/apps",                 R.string.help_apps),
+    CmdEntry("/sec",                  R.string.help_sec),
+    CmdEntry("/arsenal",              R.string.help_arsenal),
+    CmdEntry("/stats",                R.string.help_stats),
+    CmdEntry("/clean",                R.string.help_clean),
+    CmdEntry("/help",                 R.string.help_help),
 )
 
 @Composable
@@ -63,8 +72,8 @@ fun HelpOverlay(onDismiss: () -> Unit) {
         Spacer(Modifier.height(TensorSpacing.md))
 
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            TerminalSectionLabel(label = "COMMAND REFERENCE", modifier = Modifier.weight(1f))
-            TerminalButton(label = "CLOSE", onClick = onDismiss)
+            TerminalSectionLabel(label = stringResource(R.string.help_title), modifier = Modifier.weight(1f))
+            TerminalButton(label = stringResource(R.string.common_close), onClick = onDismiss)
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
@@ -75,15 +84,15 @@ fun HelpOverlay(onDismiss: () -> Unit) {
                     modifier          = Modifier.fillMaxWidth().padding(vertical = TensorSpacing.xxs),
                     verticalAlignment = Alignment.Top
                 ) {
-                    Text(text = cmd.syntax,       style = MaterialTheme.typography.bodySmall, color = colors.primary,       modifier = Modifier.weight(0.48f))
-                    Text(text = cmd.description,  style = MaterialTheme.typography.bodySmall, color = colors.onBackground,  modifier = Modifier.weight(0.52f))
+                    Text(text = cmd.syntax, style = MaterialTheme.typography.bodySmall, color = colors.primary, modifier = Modifier.weight(0.48f))
+                    Text(text = stringResource(cmd.descriptionRes), style = MaterialTheme.typography.bodySmall, color = colors.onBackground, modifier = Modifier.weight(0.52f))
                 }
             }
 
             TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
             Text(
-                text  = "Swipe up on the header area to open the app drawer.",
+                text  = stringResource(R.string.help_swipe_hint),
                 style = MaterialTheme.typography.labelSmall,
                 color = colors.onSurface
             )

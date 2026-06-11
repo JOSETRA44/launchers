@@ -11,6 +11,8 @@ sealed class CommandAction {
     data class SetBarSize(val size: BarSize) : CommandAction()
     data class SetFontScale(val scale: Float) : CommandAction()
     data class SetClockFormat(val use24h: Boolean) : CommandAction()
+    data class SetMargin(val top: Boolean, val dp: Int) : CommandAction()
+    data class SetLanguage(val tag: String) : CommandAction()
     // Folders
     data class CreateFolder(val name: String) : CommandAction()
     data class AddToFolder(val folderName: String, val appQuery: String) : CommandAction()

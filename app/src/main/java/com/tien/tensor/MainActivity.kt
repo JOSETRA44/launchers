@@ -41,8 +41,11 @@ import com.tien.tensor.presentation.settings.SettingsScreen
 import com.tien.tensor.presentation.settings.SettingsViewModel
 import com.tien.tensor.presentation.statusbar.StatusBarViewModel
 import com.tien.tensor.presentation.statusbar.TensorStatusBar
+import com.tien.tensor.ui.TensorLocale
 import com.tien.tensor.ui.theme.LauncherTheme
 import com.tien.tensor.ui.theme.TensorTheme
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
 
@@ -71,6 +74,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settingsState by settingsViewModel.uiState.collectAsStateWithLifecycle()
 
+            TensorLocale(languageTag = settingsState.uiPrefs.language) {
             TensorTheme(
                 themeId   = settingsState.selectedThemeId,
                 fontScale = settingsState.uiPrefs.fontScale
@@ -97,6 +101,12 @@ class MainActivity : ComponentActivity() {
                         .windowInsetsPadding(
                             WindowInsets.statusBars.union(WindowInsets.displayCutout)
                                 .only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
+                        )
+                        // User-defined safety margins for cases/curved edges/protectors
+                        // (Settings → SPACING, or /margin). Applied live.
+                        .padding(
+                            top    = settingsState.uiPrefs.marginTopDp.dp,
+                            bottom = settingsState.uiPrefs.marginBottomDp.dp
                         )
                 ) {
                     if (!hasBooted) {
@@ -131,6 +141,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+            }
             }
         }
     }

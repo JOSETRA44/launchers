@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.tien.tensor.R
 import com.tien.tensor.ui.component.MatrixRainEffect
 import com.tien.tensor.ui.theme.LauncherTheme
 import com.tien.tensor.ui.theme.TensorSpacing
@@ -42,7 +44,7 @@ fun ChargingOverlay(batteryPercent: Int, onDismiss: () -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text  = ">> CHARGING <<",
+                text  = stringResource(R.string.charging_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = colors.terminalPrompt
             )
@@ -60,7 +62,7 @@ fun ChargingOverlay(batteryPercent: Int, onDismiss: () -> Unit) {
             )
             Spacer(Modifier.height(TensorSpacing.xl))
             Text(
-                text  = "[ TAP TO DISMISS ]",
+                text  = stringResource(R.string.charging_tap_dismiss),
                 style = MaterialTheme.typography.labelSmall,
                 color = colors.onSurface
             )
