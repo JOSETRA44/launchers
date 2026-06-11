@@ -86,7 +86,20 @@ class LauncherViewModel(
         }
         viewModelScope.launch { getPinnedAppsUseCase().collect { p -> _state.update { it.copy(pinnedApps = p) } } }
         viewModelScope.launch { getFoldersUseCase().collect  { f -> _state.update { it.copy(folders = f) } } }
-        viewModelScope.launch { getSystemStatusUseCase().collect { s -> _state.update { it.copy(systemStatus = s) } } }
+        viewModelScope.launch {
+            var wasCharging = false
+            getSystemStatusUseCase().collect { status ->
+                val justPluggedIn = !wasCharging && status.isCharging
+                wasCharging = status.isCharging
+                _state.update {
+                    it.copy(
+                        systemStatus = status,
+                        // Auto-show on plug-in; hide on unplug; manual dismiss persists while charging
+                        showChargingOverlay = (it.showChargingOverlay || justPluggedIn) && status.isCharging
+                    )
+                }
+            }
+        }
         viewModelScope.launch { getNotificationCountsUseCase().collect { c -> _state.update { it.copy(notificationCounts = c) } } }
         viewModelScope.launch {
             while (true) { delay(1_000); _state.update { it.copy(currentTime = formattedTime(), currentDate = formattedDate()) } }
@@ -124,6 +137,7 @@ class LauncherViewModel(
     // ── Overlay actions ───────────────────────────────────────────────────────
 
     fun onDismissHelp()                { _state.update { it.copy(showHelp = false) } }
+    fun onDismissChargingOverlay()     { _state.update { it.copy(showChargingOverlay = false) } }
     fun onHistoryTap(cmd: String)      { _state.update { it.copy(searchQuery = cmd) } }
     fun onOpenFolder(folderId: String) { _state.update { it.copy(activeFolderId = folderId) } }
     fun onCloseFolderOverlay()         { _state.update { it.copy(activeFolderId = null) } }
@@ -185,6 +199,8 @@ class LauncherViewModel(
             CommandAction.ClearHistory  -> { viewModelScope.launch { clearHistoryUseCase(); showOutput("> Launch history cleared.") } }
             CommandAction.OpenSettings  -> { viewModelScope.launch { _navEvents.emit(AppDestination.SETTINGS) }; showOutput("> Opening settings...") }
             CommandAction.OpenAppList   -> { viewModelScope.launch { _navEvents.emit(AppDestination.APP_LIST) }; showOutput("> Opening apps...") }
+            CommandAction.OpenSecurity  -> { viewModelScope.launch { _navEvents.emit(AppDestination.SECURITY) }; showOutput("> Opening security toolkit...") }
+            CommandAction.OpenInsights  -> { viewModelScope.launch { _navEvents.emit(AppDestination.INSIGHTS) }; showOutput("> Opening insights...") }
             is CommandAction.Unknown    -> showOutput("> Unknown: \"${action.input}\". Type /help.")
         }
     }

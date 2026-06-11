@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import com.tien.tensor.ui.component.BlinkingCursor
+import com.tien.tensor.ui.component.MatrixRainEffect
 import com.tien.tensor.ui.component.TypewriterText
 import com.tien.tensor.ui.theme.LauncherTheme
 import com.tien.tensor.ui.theme.TensorSpacing
@@ -71,6 +72,13 @@ fun BootScreen(onBootComplete: () -> Unit) {
             .background(colors.background)
             .graphicsLayer { this.alpha = alpha }
     ) {
+        // Subtle digital rain behind the boot log
+        MatrixRainEffect(
+            modifier = Modifier.fillMaxSize(),
+            color    = colors.primary,
+            maxAlpha = 0.16f
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()

@@ -19,7 +19,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tien.tensor.di.AppModule
 import com.tien.tensor.presentation.applist.AppListScreen
 import com.tien.tensor.presentation.boot.BootScreen
+import com.tien.tensor.presentation.insights.InsightsScreen
 import com.tien.tensor.presentation.launcher.LauncherScreen
+import com.tien.tensor.presentation.security.SecurityScreen
 import com.tien.tensor.presentation.navigation.AppDestination
 import com.tien.tensor.presentation.settings.SettingsScreen
 import com.tien.tensor.presentation.settings.SettingsViewModel
@@ -76,6 +78,10 @@ class MainActivity : ComponentActivity() {
                                     onNavigateBack = { destination = AppDestination.HOME },
                                     viewModel      = settingsViewModel
                                 )
+                            AppDestination.SECURITY ->
+                                SecurityScreen(onNavigateBack = { destination = AppDestination.HOME })
+                            AppDestination.INSIGHTS ->
+                                InsightsScreen(onNavigateBack = { destination = AppDestination.HOME })
                         }
                     }
                 }

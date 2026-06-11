@@ -13,14 +13,20 @@ import com.tien.tensor.data.repository.AppUsageRepositoryImpl
 import com.tien.tensor.data.repository.FolderRepositoryImpl
 import com.tien.tensor.data.repository.NotificationRepositoryImpl
 import com.tien.tensor.data.repository.PinnedAppsRepositoryImpl
+import com.tien.tensor.data.repository.SecurityRepositoryImpl
+import com.tien.tensor.data.repository.StepCounterRepositoryImpl
 import com.tien.tensor.data.repository.SystemStatusRepositoryImpl
 import com.tien.tensor.data.repository.ThemeRepositoryImpl
+import com.tien.tensor.data.repository.UsageStatsRepositoryImpl
 import com.tien.tensor.data.source.AppDataSource
 import com.tien.tensor.data.source.AppUsageDataSource
 import com.tien.tensor.data.source.FolderDataSource
 import com.tien.tensor.data.source.PinnedAppsDataSource
 import com.tien.tensor.data.source.PreferencesDataSource
+import com.tien.tensor.data.source.SecurityDataSource
+import com.tien.tensor.data.source.StepCounterDataSource
 import com.tien.tensor.data.source.SystemStatusDataSource
+import com.tien.tensor.data.source.UsageStatsDataSource
 import com.tien.tensor.domain.port.AppInfoLauncher
 import com.tien.tensor.domain.port.AppLauncher
 import com.tien.tensor.domain.port.AppRepository
@@ -28,20 +34,28 @@ import com.tien.tensor.domain.port.AppUsageRepository
 import com.tien.tensor.domain.port.FolderRepository
 import com.tien.tensor.domain.port.NotificationRepository
 import com.tien.tensor.domain.port.PinnedAppsRepository
+import com.tien.tensor.domain.port.SecurityRepository
+import com.tien.tensor.domain.port.StepCounterRepository
 import com.tien.tensor.domain.port.SystemStatusRepository
 import com.tien.tensor.domain.port.ThemeRepository
+import com.tien.tensor.domain.port.UsageStatsRepository
 import com.tien.tensor.domain.port.WebSearchLauncher
 import com.tien.tensor.domain.usecase.AddToFolderUseCase
 import com.tien.tensor.domain.usecase.ClearHistoryUseCase
 import com.tien.tensor.domain.usecase.CreateFolderUseCase
 import com.tien.tensor.domain.usecase.DeleteFolderUseCase
+import com.tien.tensor.domain.usecase.GeneratePasswordUseCase
 import com.tien.tensor.domain.usecase.GetFoldersUseCase
 import com.tien.tensor.domain.usecase.GetInstalledAppsUseCase
 import com.tien.tensor.domain.usecase.GetNotificationCountsUseCase
 import com.tien.tensor.domain.usecase.GetPinnedAppsUseCase
+import com.tien.tensor.domain.usecase.GetSecurityReportUseCase
 import com.tien.tensor.domain.usecase.GetSmartAppsUseCase
+import com.tien.tensor.domain.usecase.GetStepsUseCase
 import com.tien.tensor.domain.usecase.GetSystemStatusUseCase
 import com.tien.tensor.domain.usecase.GetThemeUseCase
+import com.tien.tensor.domain.usecase.GetUsageStatsUseCase
+import com.tien.tensor.domain.usecase.HashTextUseCase
 import com.tien.tensor.domain.usecase.LaunchAppUseCase
 import com.tien.tensor.domain.usecase.ParseCommandUseCase
 import com.tien.tensor.domain.usecase.PinAppUseCase
@@ -51,7 +65,9 @@ import com.tien.tensor.domain.usecase.SetThemeUseCase
 import com.tien.tensor.domain.usecase.TrackAppLaunchUseCase
 import com.tien.tensor.domain.usecase.UnpinAppUseCase
 import com.tien.tensor.presentation.applist.AppListViewModel
+import com.tien.tensor.presentation.insights.InsightsViewModel
 import com.tien.tensor.presentation.launcher.LauncherViewModel
+import com.tien.tensor.presentation.security.SecurityViewModel
 import com.tien.tensor.presentation.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -75,6 +91,7 @@ object AppModule {
     private val usageDataStore   by lazy { dataStore("tensor_usage")  }
     private val pinnedDataStore  by lazy { dataStore("tensor_pinned") }
     private val folderDataStore  by lazy { dataStore("tensor_folders") }
+    private val stepsDataStore   by lazy { dataStore("tensor_steps") }
 
     private val appDataSource         by lazy { AppDataSource(appContext.packageManager) }
     private val preferencesDataSource by lazy { PreferencesDataSource(themeDataStore) }
@@ -82,6 +99,9 @@ object AppModule {
     private val pinnedAppsDataSource  by lazy { PinnedAppsDataSource(pinnedDataStore) }
     private val folderDataSource      by lazy { FolderDataSource(folderDataStore) }
     private val systemStatusDataSource by lazy { SystemStatusDataSource(appContext) }
+    private val securityDataSource    by lazy { SecurityDataSource(appContext) }
+    private val usageStatsDataSource  by lazy { UsageStatsDataSource(appContext) }
+    private val stepCounterDataSource by lazy { StepCounterDataSource(appContext, stepsDataStore) }
 
     // ── Repositories ──────────────────────────────────────────────────────────
 
@@ -92,6 +112,9 @@ object AppModule {
     private val folderRepository: FolderRepository     by lazy { FolderRepositoryImpl(folderDataSource) }
     private val systemStatusRepository: SystemStatusRepository by lazy { SystemStatusRepositoryImpl(systemStatusDataSource) }
     private val notificationRepository: NotificationRepository by lazy { NotificationRepositoryImpl() }
+    private val securityRepository: SecurityRepository         by lazy { SecurityRepositoryImpl(securityDataSource) }
+    private val usageStatsRepository: UsageStatsRepository     by lazy { UsageStatsRepositoryImpl(usageStatsDataSource) }
+    private val stepCounterRepository: StepCounterRepository   by lazy { StepCounterRepositoryImpl(stepCounterDataSource) }
 
     // ── Ports ─────────────────────────────────────────────────────────────────
 
@@ -120,6 +143,11 @@ object AppModule {
     private val deleteFolderUseCase       by lazy { DeleteFolderUseCase(folderRepository) }
     private val getSystemStatusUseCase    by lazy { GetSystemStatusUseCase(systemStatusRepository) }
     private val getNotificationCountsUseCase by lazy { GetNotificationCountsUseCase(notificationRepository) }
+    private val getSecurityReportUseCase  by lazy { GetSecurityReportUseCase(securityRepository) }
+    private val generatePasswordUseCase   by lazy { GeneratePasswordUseCase() }
+    private val hashTextUseCase           by lazy { HashTextUseCase() }
+    private val getUsageStatsUseCase      by lazy { GetUsageStatsUseCase(usageStatsRepository) }
+    private val getStepsUseCase           by lazy { GetStepsUseCase(stepCounterRepository) }
 
     // ── ViewModel Factories ───────────────────────────────────────────────────
 
@@ -154,6 +182,14 @@ object AppModule {
 
     fun settingsViewModelFactory() = factory {
         SettingsViewModel(getThemeUseCase, setThemeUseCase, clearHistoryUseCase)
+    }
+
+    fun securityViewModelFactory() = factory {
+        SecurityViewModel(getSecurityReportUseCase, generatePasswordUseCase, hashTextUseCase)
+    }
+
+    fun insightsViewModelFactory() = factory {
+        InsightsViewModel(getUsageStatsUseCase, getStepsUseCase)
     }
 
     @Suppress("UNCHECKED_CAST")

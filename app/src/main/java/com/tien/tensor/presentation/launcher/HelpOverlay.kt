@@ -38,6 +38,8 @@ private val COMMANDS = listOf(
     CmdEntry("/folder <name>",         "Open folder overlay"),
     CmdEntry("/settings",              "Open settings"),
     CmdEntry("/apps",                  "Open app list"),
+    CmdEntry("/sec",                   "Security toolkit & device audit"),
+    CmdEntry("/stats",                 "Screen time & step insights"),
     CmdEntry("/clean",                 "Clear launch history"),
     CmdEntry("/help",                  "Show this reference"),
 )

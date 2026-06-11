@@ -32,6 +32,8 @@ class ParseCommandUseCase {
             "clean", "clear", "cls"  -> CommandAction.ClearHistory
             "settings", "cfg"        -> CommandAction.OpenSettings
             "apps", "ls", "list"     -> CommandAction.OpenAppList
+            "sec", "security", "audit" -> CommandAction.OpenSecurity
+            "stats", "insights", "usage" -> CommandAction.OpenInsights
             else                      -> CommandAction.Unknown(raw)
         }
     }

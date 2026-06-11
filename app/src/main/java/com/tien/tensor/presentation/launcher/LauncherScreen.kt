@@ -62,6 +62,15 @@ fun LauncherScreen(
         viewModel.navigationEvents.collect { dest -> onNavigate(dest) }
     }
 
+    // Charging overlay takes precedence over everything
+    if (state.showChargingOverlay) {
+        ChargingOverlay(
+            batteryPercent = state.systemStatus.batteryPercent,
+            onDismiss      = viewModel::onDismissChargingOverlay
+        )
+        return
+    }
+
     // Folder overlay takes precedence
     if (state.activeFolderId != null) {
         val folder = state.folders.firstOrNull { it.id == state.activeFolderId }
@@ -224,9 +233,11 @@ fun LauncherScreen(
             }
 
             // Nav row
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = TensorSpacing.sm), horizontalArrangement = Arrangement.spacedBy(TensorSpacing.sm)) {
-                TerminalButton(label = "ALL APPS", onClick = { onNavigate(AppDestination.APP_LIST) }, modifier = Modifier.weight(1f))
-                TerminalButton(label = "SETTINGS", onClick = { onNavigate(AppDestination.SETTINGS) }, modifier = Modifier.weight(1f))
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = TensorSpacing.sm), horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
+                TerminalButton(label = "APPS",  onClick = { onNavigate(AppDestination.APP_LIST) }, modifier = Modifier.weight(1f))
+                TerminalButton(label = "SEC",   onClick = { onNavigate(AppDestination.SECURITY) }, modifier = Modifier.weight(1f))
+                TerminalButton(label = "STATS", onClick = { onNavigate(AppDestination.INSIGHTS) }, modifier = Modifier.weight(1f))
+                TerminalButton(label = "CFG",   onClick = { onNavigate(AppDestination.SETTINGS) }, modifier = Modifier.weight(1f))
             }
         }
 

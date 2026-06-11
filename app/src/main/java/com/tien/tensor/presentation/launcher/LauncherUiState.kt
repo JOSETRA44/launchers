@@ -22,5 +22,6 @@ data class LauncherUiState(
     val commandOutput: String? = null,
     val showHelp: Boolean = false,
     val commandHistory: List<String> = emptyList(),
-    val activeFolderId: String? = null
+    val activeFolderId: String? = null,
+    val showChargingOverlay: Boolean = false
 )
