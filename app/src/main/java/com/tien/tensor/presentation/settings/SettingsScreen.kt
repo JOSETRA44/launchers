@@ -1,6 +1,8 @@
 package com.tien.tensor.presentation.settings
 
+import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tien.tensor.di.AppModule
@@ -40,8 +46,13 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit,
     viewModel: SettingsViewModel = viewModel(factory = AppModule.settingsViewModelFactory())
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val colors = LauncherTheme.colors
+    val state   by viewModel.uiState.collectAsStateWithLifecycle()
+    val colors  = LauncherTheme.colors
+    val context = LocalContext.current
+
+    val notifEnabled = remember(Unit) {
+        NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
+    }
 
     Column(
         modifier = Modifier
@@ -50,71 +61,80 @@ fun SettingsScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = TensorSpacing.screenH)
+            .verticalScroll(rememberScrollState())
     ) {
         Spacer(Modifier.height(TensorSpacing.md))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             TerminalPromptHeader(path = "settings")
             TerminalButton(label = "BACK", onClick = onNavigateBack)
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
+        // Theme section
         TerminalSectionLabel(label = "THEME")
         Spacer(Modifier.height(TensorSpacing.sm))
-
         state.availableThemes.forEach { theme ->
-            ThemeOptionRow(
-                theme = theme,
-                isSelected = theme.id == state.selectedThemeId,
-                onSelect = { viewModel.onThemeSelected(theme.id) }
-            )
+            ThemeOptionRow(theme = theme, isSelected = theme.id == state.selectedThemeId, onSelect = { viewModel.onThemeSelected(theme.id) })
             Spacer(Modifier.height(TensorSpacing.xs))
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
+        // Usage data section
         TerminalSectionLabel(label = "USAGE DATA")
         Spacer(Modifier.height(TensorSpacing.sm))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Launch history (RECENT)",
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.onBackground,
-                modifier = Modifier.weight(1f)
-            )
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(text = "Launch history (RECENT)", style = MaterialTheme.typography.bodySmall, color = colors.onBackground, modifier = Modifier.weight(1f))
             TerminalButton(
-                label = if (state.historyCleared) "CLEARED" else "CLEAR HISTORY",
+                label   = if (state.historyCleared) "CLEARED" else "CLEAR HISTORY",
                 onClick = { if (!state.historyCleared) viewModel.onClearHistory() }
             )
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
+        // Notifications section
+        TerminalSectionLabel(label = "NOTIFICATIONS")
+        Spacer(Modifier.height(TensorSpacing.sm))
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Notification badges", style = MaterialTheme.typography.bodySmall, color = colors.onBackground)
+                Text(
+                    text  = if (notifEnabled) "ENABLED" else "DISABLED",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (notifEnabled) colors.primary else colors.error
+                )
+            }
+            if (!notifEnabled) {
+                TerminalButton(
+                    label   = "GRANT ACCESS",
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        context.startActivity(intent)
+                    }
+                )
+            }
+        }
+
+        TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
+
+        // System info section
         TerminalSectionLabel(label = "SYSTEM INFO")
         Spacer(Modifier.height(TensorSpacing.sm))
-
-        SystemInfoRow(key = "OS", value = "Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
-        SystemInfoRow(key = "DEVICE", value = "${Build.MANUFACTURER} ${Build.MODEL}".uppercase())
+        SystemInfoRow(key = "OS",       value = "Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
+        SystemInfoRow(key = "DEVICE",   value = "${Build.MANUFACTURER} ${Build.MODEL}".uppercase())
+        SystemInfoRow(key = "ABI",      value = Build.SUPPORTED_ABIS.firstOrNull()?.uppercase() ?: "UNKNOWN")
         SystemInfoRow(key = "LAUNCHER", value = "TENSOR OS v1.0.0")
+
+        Spacer(Modifier.height(TensorSpacing.md))
     }
 }
 
 @Composable
-private fun ThemeOptionRow(
-    theme: ThemeConfig,
-    isSelected: Boolean,
-    onSelect: () -> Unit
-) {
+private fun ThemeOptionRow(theme: ThemeConfig, isSelected: Boolean, onSelect: () -> Unit) {
     val colors = LauncherTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     Row(
@@ -127,41 +147,16 @@ private fun ThemeOptionRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = if (isSelected) "> ${theme.name}" else "  ${theme.name}",
-            style = MaterialTheme.typography.bodyMedium,
-            color = if (isSelected) colors.primary else colors.onBackground
-        )
-        if (isSelected) {
-            Text(
-                text = "[ACTIVE]",
-                style = MaterialTheme.typography.labelSmall,
-                color = colors.primary
-            )
-        }
+        Text(text = if (isSelected) "> ${theme.name}" else "  ${theme.name}", style = MaterialTheme.typography.bodyMedium, color = if (isSelected) colors.primary else colors.onBackground)
+        if (isSelected) Text(text = "[ACTIVE]", style = MaterialTheme.typography.labelSmall, color = colors.primary)
     }
 }
 
 @Composable
 private fun SystemInfoRow(key: String, value: String) {
     val colors = LauncherTheme.colors
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = TensorSpacing.xxs),
-        horizontalArrangement = Arrangement.spacedBy(TensorSpacing.md)
-    ) {
-        Text(
-            text = key,
-            style = MaterialTheme.typography.labelMedium,
-            color = colors.terminalPrompt,
-            modifier = Modifier.weight(0.35f)
-        )
-        Text(
-            text = ": $value",
-            style = MaterialTheme.typography.bodySmall,
-            color = colors.onBackground,
-            modifier = Modifier.weight(0.65f)
-        )
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = TensorSpacing.xxs), horizontalArrangement = Arrangement.spacedBy(TensorSpacing.md)) {
+        Text(text = key, style = MaterialTheme.typography.labelMedium, color = colors.terminalPrompt, modifier = Modifier.weight(0.35f))
+        Text(text = ": $value", style = MaterialTheme.typography.bodySmall, color = colors.onBackground, modifier = Modifier.weight(0.65f))
     }
 }

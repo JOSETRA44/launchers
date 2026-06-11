@@ -7,6 +7,12 @@ sealed class CommandAction {
     data class PinApp(val appQuery: String) : CommandAction()
     data class UnpinApp(val appQuery: String) : CommandAction()
     data class SetTheme(val themeId: ThemeId) : CommandAction()
+    // Folders
+    data class CreateFolder(val name: String) : CommandAction()
+    data class AddToFolder(val folderName: String, val appQuery: String) : CommandAction()
+    data class DeleteFolder(val folderName: String) : CommandAction()
+    data class OpenFolder(val folderName: String) : CommandAction()
+    // System
     data object ShowHelp : CommandAction()
     data object ClearHistory : CommandAction()
     data object OpenSettings : CommandAction()

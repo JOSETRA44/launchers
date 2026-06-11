@@ -23,20 +23,23 @@ import com.tien.tensor.ui.component.TerminalSectionLabel
 import com.tien.tensor.ui.theme.LauncherTheme
 import com.tien.tensor.ui.theme.TensorSpacing
 
-private data class CommandEntry(val syntax: String, val description: String)
+private data class CmdEntry(val syntax: String, val description: String)
 
 private val COMMANDS = listOf(
-    CommandEntry("/g <query>",        "Web search"),
-    CommandEntry("/search <query>",   "Web search (alias)"),
-    CommandEntry("/open <app>",       "Launch app by name"),
-    CommandEntry("/info <app>",       "Open system app info"),
-    CommandEntry("/pin <app>",        "Add app to dock"),
-    CommandEntry("/unpin <app>",      "Remove app from dock"),
-    CommandEntry("/theme <name>",     "Switch theme: dark / cyan / matrix"),
-    CommandEntry("/settings",         "Open settings screen"),
-    CommandEntry("/apps",             "Open full app list"),
-    CommandEntry("/clean",            "Clear launch history"),
-    CommandEntry("/help",             "Show this reference"),
+    CmdEntry("/g <query>",             "Web search"),
+    CmdEntry("/open <app>",            "Launch app by name"),
+    CmdEntry("/info <app>",            "Open system app info"),
+    CmdEntry("/pin <app>",             "Add app to dock"),
+    CmdEntry("/unpin <app>",           "Remove app from dock"),
+    CmdEntry("/theme <name>",          "Switch theme: dark / cyan / matrix"),
+    CmdEntry("/mkdir <name>",          "Create a folder"),
+    CmdEntry("/group <folder> <app>",  "Add app to folder"),
+    CmdEntry("/rmdir <folder>",        "Delete a folder"),
+    CmdEntry("/folder <name>",         "Open folder overlay"),
+    CmdEntry("/settings",              "Open settings"),
+    CmdEntry("/apps",                  "Open app list"),
+    CmdEntry("/clean",                 "Clear launch history"),
+    CmdEntry("/help",                  "Show this reference"),
 )
 
 @Composable
@@ -53,59 +56,32 @@ fun HelpOverlay(onDismiss: () -> Unit) {
     ) {
         Spacer(Modifier.height(TensorSpacing.md))
 
-        Row(
-            modifier        = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TerminalSectionLabel(
-                label    = "COMMAND REFERENCE",
-                modifier = Modifier.weight(1f)
-            )
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            TerminalSectionLabel(label = "COMMAND REFERENCE", modifier = Modifier.weight(1f))
             TerminalButton(label = "CLOSE", onClick = onDismiss)
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-        ) {
+        Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             COMMANDS.forEach { cmd ->
-                CommandRow(entry = cmd)
-                Spacer(Modifier.height(TensorSpacing.xs))
+                Row(
+                    modifier          = Modifier.fillMaxWidth().padding(vertical = TensorSpacing.xxs),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(text = cmd.syntax,       style = MaterialTheme.typography.bodySmall, color = colors.primary,       modifier = Modifier.weight(0.48f))
+                    Text(text = cmd.description,  style = MaterialTheme.typography.bodySmall, color = colors.onBackground,  modifier = Modifier.weight(0.52f))
+                }
             }
 
             TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
             Text(
-                text  = "TIP: Enter any app name + tap Enter/Search to launch the top result.",
+                text  = "Swipe up on the header area to open the app drawer.",
                 style = MaterialTheme.typography.labelSmall,
                 color = colors.onSurface
             )
             Spacer(Modifier.height(TensorSpacing.md))
         }
-    }
-}
-
-@Composable
-private fun CommandRow(entry: CommandEntry) {
-    val colors = LauncherTheme.colors
-    Row(
-        modifier          = Modifier.fillMaxWidth().padding(vertical = TensorSpacing.xxs),
-        verticalAlignment = Alignment.Top
-    ) {
-        Text(
-            text     = entry.syntax,
-            style    = MaterialTheme.typography.bodySmall,
-            color    = colors.primary,
-            modifier = Modifier.weight(0.42f)
-        )
-        Text(
-            text     = entry.description,
-            style    = MaterialTheme.typography.bodySmall,
-            color    = colors.onBackground,
-            modifier = Modifier.weight(0.58f)
-        )
     }
 }

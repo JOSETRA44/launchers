@@ -2,6 +2,7 @@ package com.tien.tensor
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -50,6 +51,12 @@ class MainActivity : ComponentActivity() {
                 // Boot screen shown once per process lifecycle (survives rotation via rememberSaveable)
                 var hasBooted   by rememberSaveable { mutableStateOf(false) }
                 var destination by rememberSaveable { mutableStateOf(AppDestination.HOME) }
+
+                // Prevent the launcher from being closed by back press.
+                // On sub-screens, back returns to HOME; on HOME, the press is swallowed.
+                BackHandler {
+                    if (destination != AppDestination.HOME) destination = AppDestination.HOME
+                }
 
                 Box(
                     modifier = Modifier
