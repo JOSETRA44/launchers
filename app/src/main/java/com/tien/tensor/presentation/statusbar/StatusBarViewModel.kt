@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tien.tensor.domain.model.SystemStatus
 import com.tien.tensor.domain.usecase.GetSystemStatusUseCase
+import com.tien.tensor.domain.usecase.GetUiPrefsUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,10 +26,11 @@ data class StatusBarUiState(
  * replacing the hidden system bar while the launcher is in immersive mode.
  */
 class StatusBarViewModel(
-    private val getSystemStatusUseCase: GetSystemStatusUseCase
+    private val getSystemStatusUseCase: GetSystemStatusUseCase,
+    private val getUiPrefsUseCase: GetUiPrefsUseCase
 ) : ViewModel() {
 
-    private val timeFmt = SimpleDateFormat("HH:mm", Locale.US)
+    private var timeFmt = SimpleDateFormat("HH:mm", Locale.US)
 
     private val _state = MutableStateFlow(StatusBarUiState(time = now()))
     val uiState: StateFlow<StatusBarUiState> = _state.asStateFlow()
@@ -37,6 +39,12 @@ class StatusBarViewModel(
 
     init {
         startStatusCollection()
+        viewModelScope.launch {
+            getUiPrefsUseCase().collect { prefs ->
+                timeFmt = SimpleDateFormat(if (prefs.use24hClock) "HH:mm" else "hh:mm a", Locale.US)
+                _state.update { it.copy(time = now()) }
+            }
+        }
         viewModelScope.launch {
             while (true) {
                 _state.update { it.copy(time = now()) }

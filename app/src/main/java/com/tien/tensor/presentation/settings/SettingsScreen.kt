@@ -32,8 +32,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tien.tensor.di.AppModule
+import com.tien.tensor.domain.model.BarSize
 import com.tien.tensor.domain.model.ThemeConfig
 import com.tien.tensor.domain.model.ThemeId
+import com.tien.tensor.domain.model.UiPrefs
 import com.tien.tensor.ui.component.TerminalButton
 import com.tien.tensor.ui.component.TerminalDivider
 import com.tien.tensor.ui.component.TerminalPromptHeader
@@ -78,6 +80,42 @@ fun SettingsScreen(
         state.availableThemes.forEach { theme ->
             ThemeOptionRow(theme = theme, isSelected = theme.id == state.selectedThemeId, onSelect = { viewModel.onThemeSelected(theme.id) })
             Spacer(Modifier.height(TensorSpacing.xs))
+        }
+
+        TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
+
+        // Display customization section
+        TerminalSectionLabel(label = "DISPLAY")
+        Spacer(Modifier.height(TensorSpacing.sm))
+
+        OptionGroupRow(label = "STATUS BAR") {
+            BarSize.entries.forEach { size ->
+                TerminalButton(
+                    label   = size.displayName,
+                    active  = state.uiPrefs.statusBarSize == size,
+                    onClick = { viewModel.onBarSizeSelected(size) }
+                )
+            }
+        }
+        Spacer(Modifier.height(TensorSpacing.xs))
+        OptionGroupRow(label = "FONT SIZE") {
+            UiPrefs.FONT_SCALES.forEach { scale ->
+                TerminalButton(
+                    label   = "${(scale * 100).toInt()}%",
+                    active  = state.uiPrefs.fontScale == scale,
+                    onClick = { viewModel.onFontScaleSelected(scale) }
+                )
+            }
+        }
+        Spacer(Modifier.height(TensorSpacing.xs))
+        OptionGroupRow(label = "CLOCK") {
+            TerminalButton(label = "12H", active = !state.uiPrefs.use24hClock, onClick = { viewModel.onClockFormatSelected(false) })
+            TerminalButton(label = "24H", active = state.uiPrefs.use24hClock,  onClick = { viewModel.onClockFormatSelected(true) })
+            TerminalButton(
+                label   = if (state.uiPrefs.showClockSeconds) "SEC:ON" else "SEC:OFF",
+                active  = state.uiPrefs.showClockSeconds,
+                onClick = viewModel::onToggleClockSeconds
+            )
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
@@ -130,6 +168,15 @@ fun SettingsScreen(
         SystemInfoRow(key = "LAUNCHER", value = "TENSOR OS v1.0.0")
 
         Spacer(Modifier.height(TensorSpacing.md))
+    }
+}
+
+@Composable
+private fun OptionGroupRow(label: String, options: @Composable () -> Unit) {
+    val colors = LauncherTheme.colors
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(text = label, style = MaterialTheme.typography.labelMedium, color = colors.terminalPrompt)
+        Row(horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) { options() }
     }
 }
 

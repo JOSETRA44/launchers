@@ -1,6 +1,8 @@
 package com.tien.tensor
 
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -9,9 +11,15 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -53,10 +61,20 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         applyImmersiveMode()
 
+        // Render into the cutout area instead of letterboxing while immersive;
+        // the composition pads itself with the displayCutout insets.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+
         setContent {
             val settingsState by settingsViewModel.uiState.collectAsStateWithLifecycle()
 
-            TensorTheme(themeId = settingsState.selectedThemeId) {
+            TensorTheme(
+                themeId   = settingsState.selectedThemeId,
+                fontScale = settingsState.uiPrefs.fontScale
+            ) {
                 val colors = LauncherTheme.colors
 
                 // Boot screen shown once per process lifecycle (survives rotation via rememberSaveable)
@@ -73,13 +91,18 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(colors.background)
-                        // No-op while immersive; keeps content clear if bars ever return
-                        .statusBarsPadding()
+                        // Keep the launcher's status bar clear of notches/punch-holes
+                        // (display cutout) and of the system bar if it ever returns.
+                        // Without this, devices with a camera cutout hide the bar.
+                        .windowInsetsPadding(
+                            WindowInsets.statusBars.union(WindowInsets.displayCutout)
+                                .only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
+                        )
                 ) {
                     if (!hasBooted) {
                         BootScreen(onBootComplete = { hasBooted = true })
                     } else {
-                        TensorStatusBar(viewModel = statusBarViewModel)
+                        TensorStatusBar(viewModel = statusBarViewModel, barSize = settingsState.uiPrefs.statusBarSize)
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()

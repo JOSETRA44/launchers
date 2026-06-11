@@ -34,7 +34,8 @@ export const TerminalSimulator = () => {
 
     addLine(`<span class="text-prompt">guest@tensor:~$</span> ${trimmed}`, true);
     
-    const parts = trimmed.split(' ');
+    // FIX: Handle multiple spaces seamlessly
+    const parts = trimmed.split(/\s+/);
     const mainCmd = parts[0].toLowerCase();
     const args = parts.slice(1);
 
@@ -123,18 +124,19 @@ export const TerminalSimulator = () => {
         {/* Terminal Body */}
         <div className="p-4 flex flex-col gap-1 flex-grow overflow-y-auto">
           <AnimatePresence>
-            {lines.map((line) => (
-              <motion.div
-                key={line.id}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className={`break-words ${line.className || 'text-primary'}`}
-                dangerouslySetInnerHTML={line.isHtml ? { __html: line.text } : undefined}
-              >
-                {!line.isHtml && line.text}
-              </motion.div>
-            ))}
+            {lines.map((line) => {
+              const motionProps = {
+                initial: { opacity: 0, x: -10, filter: 'blur(4px)' },
+                animate: { opacity: 1, x: 0, filter: 'blur(0px)' },
+                transition: { duration: 0.3, ease: 'easeOut' as const },
+                className: `break-words ${line.className || 'text-primary'}`,
+              };
+              
+              if (line.isHtml) {
+                return <motion.div key={line.id} {...motionProps} dangerouslySetInnerHTML={{ __html: line.text }} />;
+              }
+              return <motion.div key={line.id} {...motionProps}>{line.text}</motion.div>;
+            })}
           </AnimatePresence>
           
           <div className="flex items-center gap-2 mt-2">

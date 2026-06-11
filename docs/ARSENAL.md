@@ -49,6 +49,8 @@ by module id; severity badges on the hub update in real time.
 |---|---|---|
 | **INTEGRITY+** | one-shot | Screen lock, storage encryption (`DevicePolicyManager`), root indicators (su paths + test-keys build tags), ADB/dev-options surface, count of apps able to request package installs |
 | **APP RISK** | one-shot | Heuristic risk score per installed app: granted dangerous-permission groups (CAM/MIC/LOC/SMS/…), sideloaded install source (`InstallSourceInfo`), debuggable flag, `targetSdk < 26`, surveillance combos (CAM+MIC+LOC). Score → LOW/MEDIUM/HIGH/CRITICAL |
+| **ACCESS CONTROL** | one-shot | Enabled accessibility services (screen-reading/spyware vector), third-party notification listeners (can read 2FA codes), active device admins, default IME — the who-can-see-everything audit |
+| **TRUST STORE** | one-shot | Enumerates `AndroidCAStore`: user-installed CA certificates (TLS MITM surface, flagged HIGH with subject CN) vs system authorities |
 | **NET INTEL** | streaming | Live `LinkProperties`/`NetworkCapabilities` of the default network: HTTP proxy on the link (possible MITM), Private DNS (DoT) state, captive portal, unvalidated network, VPN, resolvers, local addressing |
 | **SYS TELEMETRY** | streaming (2.5 s) | Memory pressure (`ActivityManager`), storage headroom (`StatFs`), battery temperature/voltage, thermal throttling (`PowerManager.currentThermalStatus`), uptime |
 

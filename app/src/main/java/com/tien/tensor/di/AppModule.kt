@@ -17,6 +17,7 @@ import com.tien.tensor.data.repository.SecurityRepositoryImpl
 import com.tien.tensor.data.repository.StepCounterRepositoryImpl
 import com.tien.tensor.data.repository.SystemStatusRepositoryImpl
 import com.tien.tensor.data.repository.ThemeRepositoryImpl
+import com.tien.tensor.data.repository.UiPrefsRepositoryImpl
 import com.tien.tensor.data.repository.UsageStatsRepositoryImpl
 import com.tien.tensor.data.source.AppDataSource
 import com.tien.tensor.data.source.AppUsageDataSource
@@ -26,11 +27,14 @@ import com.tien.tensor.data.source.PreferencesDataSource
 import com.tien.tensor.data.source.SecurityDataSource
 import com.tien.tensor.data.source.StepCounterDataSource
 import com.tien.tensor.data.source.SystemStatusDataSource
+import com.tien.tensor.data.source.UiPrefsDataSource
+import com.tien.tensor.data.arsenal.AccessControlModule
 import com.tien.tensor.data.arsenal.AppRiskModule
 import com.tien.tensor.data.arsenal.ArsenalRegistryImpl
 import com.tien.tensor.data.arsenal.DeviceIntegrityModule
 import com.tien.tensor.data.arsenal.NetworkIntelModule
 import com.tien.tensor.data.arsenal.RuntimeTelemetryModule
+import com.tien.tensor.data.arsenal.TrustStoreModule
 import com.tien.tensor.data.source.UsageStatsDataSource
 import com.tien.tensor.domain.port.AppInfoLauncher
 import com.tien.tensor.domain.port.AppLauncher
@@ -44,6 +48,7 @@ import com.tien.tensor.domain.port.SecurityRepository
 import com.tien.tensor.domain.port.StepCounterRepository
 import com.tien.tensor.domain.port.SystemStatusRepository
 import com.tien.tensor.domain.port.ThemeRepository
+import com.tien.tensor.domain.port.UiPrefsRepository
 import com.tien.tensor.domain.port.UsageStatsRepository
 import com.tien.tensor.domain.port.WebSearchLauncher
 import com.tien.tensor.domain.usecase.AddToFolderUseCase
@@ -62,6 +67,8 @@ import com.tien.tensor.domain.usecase.GetSmartAppsUseCase
 import com.tien.tensor.domain.usecase.GetStepsUseCase
 import com.tien.tensor.domain.usecase.GetSystemStatusUseCase
 import com.tien.tensor.domain.usecase.GetThemeUseCase
+import com.tien.tensor.domain.usecase.GetUiPrefsUseCase
+import com.tien.tensor.domain.usecase.UpdateUiPrefsUseCase
 import com.tien.tensor.domain.usecase.GetUsageStatsUseCase
 import com.tien.tensor.domain.usecase.HashTextUseCase
 import com.tien.tensor.domain.usecase.LaunchAppUseCase
@@ -109,6 +116,7 @@ object AppModule {
     private val pinnedAppsDataSource  by lazy { PinnedAppsDataSource(pinnedDataStore) }
     private val folderDataSource      by lazy { FolderDataSource(folderDataStore) }
     private val systemStatusDataSource by lazy { SystemStatusDataSource(appContext) }
+    private val uiPrefsDataSource      by lazy { UiPrefsDataSource(themeDataStore) }
     private val securityDataSource    by lazy { SecurityDataSource(appContext) }
     private val usageStatsDataSource  by lazy { UsageStatsDataSource(appContext) }
     private val stepCounterDataSource by lazy { StepCounterDataSource(appContext, stepsDataStore) }
@@ -117,6 +125,7 @@ object AppModule {
 
     private val appRepository: AppRepository           by lazy { AppRepositoryImpl(appDataSource, appContext) }
     private val themeRepository: ThemeRepository       by lazy { ThemeRepositoryImpl(preferencesDataSource) }
+    private val uiPrefsRepository: UiPrefsRepository   by lazy { UiPrefsRepositoryImpl(uiPrefsDataSource) }
     private val appUsageRepository: AppUsageRepository by lazy { AppUsageRepositoryImpl(appUsageDataSource) }
     private val pinnedAppsRepository: PinnedAppsRepository by lazy { PinnedAppsRepositoryImpl(pinnedAppsDataSource) }
     private val folderRepository: FolderRepository     by lazy { FolderRepositoryImpl(folderDataSource) }
@@ -131,7 +140,9 @@ object AppModule {
         ArsenalRegistryImpl(
             listOf(
                 DeviceIntegrityModule(appContext),
+                AccessControlModule(appContext),
                 AppRiskModule(appContext),
+                TrustStoreModule(),
                 NetworkIntelModule(appContext),
                 RuntimeTelemetryModule(appContext)
             )
@@ -151,6 +162,8 @@ object AppModule {
     private val launchAppUseCase          by lazy { LaunchAppUseCase(appLauncher) }
     private val getThemeUseCase           by lazy { GetThemeUseCase(themeRepository) }
     val setThemeUseCase                   by lazy { SetThemeUseCase(themeRepository) }
+    private val getUiPrefsUseCase         by lazy { GetUiPrefsUseCase(uiPrefsRepository) }
+    private val updateUiPrefsUseCase      by lazy { UpdateUiPrefsUseCase(uiPrefsRepository) }
     private val trackAppLaunchUseCase     by lazy { TrackAppLaunchUseCase(appUsageRepository) }
     private val getSmartAppsUseCase       by lazy { GetSmartAppsUseCase(appUsageRepository, appRepository) }
     private val clearHistoryUseCase       by lazy { ClearHistoryUseCase(appUsageRepository) }
@@ -196,7 +209,9 @@ object AppModule {
             webSearchLauncher            = webSearchLauncher,
             setThemeUseCase              = setThemeUseCase,
             getSystemStatusUseCase       = getSystemStatusUseCase,
-            getNotificationCountsUseCase = getNotificationCountsUseCase
+            getNotificationCountsUseCase = getNotificationCountsUseCase,
+            getUiPrefsUseCase            = getUiPrefsUseCase,
+            updateUiPrefsUseCase         = updateUiPrefsUseCase
         )
     }
 
@@ -205,7 +220,7 @@ object AppModule {
     }
 
     fun settingsViewModelFactory() = factory {
-        SettingsViewModel(getThemeUseCase, setThemeUseCase, clearHistoryUseCase)
+        SettingsViewModel(getThemeUseCase, getUiPrefsUseCase, setThemeUseCase, updateUiPrefsUseCase, clearHistoryUseCase)
     }
 
     fun securityViewModelFactory() = factory {
@@ -217,7 +232,7 @@ object AppModule {
     }
 
     fun statusBarViewModelFactory() = factory {
-        StatusBarViewModel(getSystemStatusUseCase)
+        StatusBarViewModel(getSystemStatusUseCase, getUiPrefsUseCase)
     }
 
     fun arsenalViewModelFactory() = factory {

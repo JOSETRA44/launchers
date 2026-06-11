@@ -23,8 +23,11 @@ import com.tien.tensor.domain.usecase.PinAppUseCase
 import com.tien.tensor.domain.usecase.RemoveFromFolderUseCase
 import com.tien.tensor.domain.usecase.SearchAppsUseCase
 import com.tien.tensor.domain.usecase.SetThemeUseCase
+import com.tien.tensor.domain.usecase.GetUiPrefsUseCase
 import com.tien.tensor.domain.usecase.TrackAppLaunchUseCase
 import com.tien.tensor.domain.usecase.UnpinAppUseCase
+import com.tien.tensor.domain.usecase.UpdateUiPrefsUseCase
+import com.tien.tensor.domain.model.UiPrefs
 import com.tien.tensor.presentation.navigation.AppDestination
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -59,10 +62,13 @@ class LauncherViewModel(
     private val webSearchLauncher: WebSearchLauncher,
     private val setThemeUseCase: SetThemeUseCase,
     private val getSystemStatusUseCase: GetSystemStatusUseCase,
-    private val getNotificationCountsUseCase: GetNotificationCountsUseCase
+    private val getNotificationCountsUseCase: GetNotificationCountsUseCase,
+    private val getUiPrefsUseCase: GetUiPrefsUseCase,
+    private val updateUiPrefsUseCase: UpdateUiPrefsUseCase
 ) : ViewModel() {
 
-    private val timeFmt = SimpleDateFormat("HH:mm:ss", Locale.US)
+    private var uiPrefs = UiPrefs()
+    private var timeFmt = SimpleDateFormat("HH:mm:ss", Locale.US)
     private val dateFmt = SimpleDateFormat("yyyy.MM.dd | EEE", Locale.US)
 
     private val _state = MutableStateFlow(
@@ -101,6 +107,19 @@ class LauncherViewModel(
             }
         }
         viewModelScope.launch { getNotificationCountsUseCase().collect { c -> _state.update { it.copy(notificationCounts = c) } } }
+        viewModelScope.launch {
+            getUiPrefsUseCase().collect { prefs ->
+                uiPrefs = prefs
+                val pattern = when {
+                    prefs.use24hClock && prefs.showClockSeconds  -> "HH:mm:ss"
+                    prefs.use24hClock                            -> "HH:mm"
+                    prefs.showClockSeconds                       -> "hh:mm:ss a"
+                    else                                         -> "hh:mm a"
+                }
+                timeFmt = SimpleDateFormat(pattern, Locale.US)
+                _state.update { it.copy(currentTime = formattedTime()) }
+            }
+        }
         viewModelScope.launch {
             while (true) { delay(1_000); _state.update { it.copy(currentTime = formattedTime(), currentDate = formattedDate()) } }
         }
@@ -171,6 +190,16 @@ class LauncherViewModel(
                 viewModelScope.launch { unpinAppUseCase(app.packageName); showOutput("> Unpinned: ${app.appName}") }
             }
             is CommandAction.SetTheme   -> { viewModelScope.launch { setThemeUseCase(action.themeId); showOutput("> Theme: ${action.themeId.displayName}") } }
+            // UI customization
+            is CommandAction.SetBarSize -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(statusBarSize = action.size)); showOutput("> Status bar: ${action.size.displayName}") }
+            }
+            is CommandAction.SetFontScale -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(fontScale = action.scale)); showOutput("> Font scale: ${(action.scale * 100).toInt()}%") }
+            }
+            is CommandAction.SetClockFormat -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(use24hClock = action.use24h)); showOutput("> Clock: ${if (action.use24h) "24H" else "12H"}") }
+            }
             // Folder commands
             is CommandAction.CreateFolder -> {
                 if (_state.value.folders.any { it.name.equals(action.name, ignoreCase = true) }) { showOutput("> \"${action.name}\" already exists."); return }

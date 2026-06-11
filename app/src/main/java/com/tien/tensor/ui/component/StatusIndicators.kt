@@ -25,9 +25,10 @@ fun SignalBars(
     level: Int,
     color: Color,
     dimColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    scale: Float = 1f
 ) {
-    Canvas(modifier = modifier.size(width = 16.dp, height = 11.dp)) {
+    Canvas(modifier = modifier.size(width = 16.dp * scale, height = 11.dp * scale)) {
         val gap      = 2.dp.toPx()
         val barW     = (size.width - gap * (BAR_COUNT - 1)) / BAR_COUNT
         val minH     = size.height * 0.3f
@@ -49,9 +50,10 @@ fun BatteryGlyph(
     percent: Int,
     charging: Boolean,
     color: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    scale: Float = 1f
 ) {
-    Canvas(modifier = modifier.size(width = 26.dp, height = 11.dp)) {
+    Canvas(modifier = modifier.size(width = 26.dp * scale, height = 11.dp * scale)) {
         val stroke  = 1.dp.toPx()
         val nubW    = 2.dp.toPx()
         val boltW   = if (charging) 7.dp.toPx() else 0f

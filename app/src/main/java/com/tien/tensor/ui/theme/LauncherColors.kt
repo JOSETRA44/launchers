@@ -61,10 +61,55 @@ private val matrixGreen = LauncherColors(
     terminalPrompt= Color(0xFF17A10C)
 )
 
+private val amberTerm = LauncherColors(
+    background    = Color(0xFF0A0700),
+    surface       = Color(0xFF140E02),
+    surfaceVariant= Color(0xFF1E1604),
+    primary       = Color(0xFFFFB000),
+    primaryDim    = Color(0xFF4D3500),
+    onBackground  = Color(0xFFC9A86A),
+    onSurface     = Color(0xFF8A7448),
+    cursor        = Color(0xFFFFC933),
+    border        = Color(0xFF3A2C08),
+    error         = Color(0xFFFF4444),
+    terminalPrompt= Color(0xFFE09E00)
+)
+
+private val redAlert = LauncherColors(
+    background    = Color(0xFF0A0000),
+    surface       = Color(0xFF140404),
+    surfaceVariant= Color(0xFF1E0808),
+    primary       = Color(0xFFFF2B2B),
+    primaryDim    = Color(0xFF4D0D0D),
+    onBackground  = Color(0xFFC98A8A),
+    onSurface     = Color(0xFF8A5555),
+    cursor        = Color(0xFFFF5555),
+    border        = Color(0xFF3A0E0E),
+    error         = Color(0xFFFFB300),
+    terminalPrompt= Color(0xFFCC2222)
+)
+
+private val arcticIce = LauncherColors(
+    background    = Color(0xFF06080C),
+    surface       = Color(0xFF0B1018),
+    surfaceVariant= Color(0xFF101826),
+    primary       = Color(0xFF9EC9FF),
+    primaryDim    = Color(0xFF1E3A5C),
+    onBackground  = Color(0xFFA8B8CC),
+    onSurface     = Color(0xFF5C7088),
+    cursor        = Color(0xFFD6E9FF),
+    border        = Color(0xFF16263A),
+    error         = Color(0xFFFF4D6A),
+    terminalPrompt= Color(0xFF7FB3E8)
+)
+
 fun themeColors(id: ThemeId): LauncherColors = when (id) {
     ThemeId.HACKER_DARK  -> hackerDark
     ThemeId.HACKER_CYAN  -> hackerCyan
     ThemeId.MATRIX_GREEN -> matrixGreen
+    ThemeId.AMBER_TERM   -> amberTerm
+    ThemeId.RED_ALERT    -> redAlert
+    ThemeId.ARCTIC_ICE   -> arcticIce
 }
 
 val LocalLauncherColors = staticCompositionLocalOf { hackerDark }

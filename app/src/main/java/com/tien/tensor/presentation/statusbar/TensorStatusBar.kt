@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.tien.tensor.domain.model.BarSize
 import com.tien.tensor.domain.model.NetworkType
 import com.tien.tensor.ui.component.BatteryGlyph
 import com.tien.tensor.ui.component.SignalBars
@@ -40,10 +41,29 @@ private const val LOW_BATTERY = 15
  * READ_PHONE_STATE permission so the exact generation (5G/4G/...) can show.
  */
 @Composable
-fun TensorStatusBar(viewModel: StatusBarViewModel) {
+fun TensorStatusBar(
+    viewModel: StatusBarViewModel,
+    barSize: BarSize = BarSize.NORMAL
+) {
     val state  by viewModel.uiState.collectAsStateWithLifecycle()
     val colors = LauncherTheme.colors
     val status = state.status
+
+    val scale = when (barSize) {
+        BarSize.COMPACT -> 0.85f
+        BarSize.NORMAL  -> 1f
+        BarSize.LARGE   -> 1.3f
+    }
+    val barPadding = when (barSize) {
+        BarSize.COMPACT -> 3.dp
+        BarSize.NORMAL  -> 6.dp
+        BarSize.LARGE   -> 10.dp
+    }
+    val timeStyle = when (barSize) {
+        BarSize.COMPACT -> MaterialTheme.typography.labelSmall
+        BarSize.NORMAL  -> MaterialTheme.typography.labelMedium
+        BarSize.LARGE   -> MaterialTheme.typography.labelLarge
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) viewModel.restartStatusCollection()
@@ -53,13 +73,13 @@ fun TensorStatusBar(viewModel: StatusBarViewModel) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = TensorSpacing.screenH, vertical = 6.dp),
+                .padding(horizontal = TensorSpacing.screenH, vertical = barPadding),
             verticalAlignment     = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // ── Clock + power save ────────────────────────────────────────────
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = state.time, style = MaterialTheme.typography.labelMedium, color = colors.primary)
+                Text(text = state.time, style = timeStyle, color = colors.primary)
                 if (status.isPowerSave) {
                     Spacer(Modifier.width(TensorSpacing.sm))
                     Text(text = "ECO", style = MaterialTheme.typography.labelSmall, color = colors.cursor)
@@ -84,7 +104,7 @@ fun TensorStatusBar(viewModel: StatusBarViewModel) {
                     )
                 ) {
                     if (status.networkType != NetworkType.NONE) {
-                        SignalBars(level = status.signalLevel, color = colors.primary, dimColor = colors.primaryDim)
+                        SignalBars(level = status.signalLevel, color = colors.primary, dimColor = colors.primaryDim, scale = scale)
                     }
                     Text(
                         text  = status.networkType.label,
@@ -98,7 +118,7 @@ fun TensorStatusBar(viewModel: StatusBarViewModel) {
                     status.batteryPercent <= LOW_BATTERY  -> colors.error
                     else                                  -> colors.terminalPrompt
                 }
-                BatteryGlyph(percent = status.batteryPercent, charging = status.isCharging, color = batteryColor)
+                BatteryGlyph(percent = status.batteryPercent, charging = status.isCharging, color = batteryColor, scale = scale)
                 Text(
                     text  = "${status.batteryPercent}%",
                     style = MaterialTheme.typography.labelSmall,

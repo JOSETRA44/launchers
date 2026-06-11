@@ -7,6 +7,10 @@ sealed class CommandAction {
     data class PinApp(val appQuery: String) : CommandAction()
     data class UnpinApp(val appQuery: String) : CommandAction()
     data class SetTheme(val themeId: ThemeId) : CommandAction()
+    // UI customization
+    data class SetBarSize(val size: BarSize) : CommandAction()
+    data class SetFontScale(val scale: Float) : CommandAction()
+    data class SetClockFormat(val use24h: Boolean) : CommandAction()
     // Folders
     data class CreateFolder(val name: String) : CommandAction()
     data class AddToFolder(val folderName: String, val appQuery: String) : CommandAction()
