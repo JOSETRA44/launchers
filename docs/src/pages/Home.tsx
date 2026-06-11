@@ -1,7 +1,39 @@
-import { Terminal, Shield, Zap, Activity, FolderGit2, HelpCircle } from 'lucide-react';
+import { Terminal, Shield, FolderGit2, HelpCircle, Database, Cpu, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { TerminalSimulator } from '../components/terminal/TerminalSimulator';
 import { useLanguage } from '../components/LanguageContext';
+import { useState, useEffect, useRef } from 'react';
+
+const DecryptText = ({ text, className }: { text: string, className?: string }) => {
+  const [display, setDisplay] = useState(text.replace(/[a-zA-Z]/g, '_'));
+  const [inView, setInView] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setInView(true);
+    });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!inView) return;
+    let iteration = 0;
+    const interval = setInterval(() => {
+      setDisplay(text.split('').map((char, i) => {
+        if (i < iteration || char === ' ') return char;
+        return String.fromCharCode(33 + Math.floor(Math.random() * 93));
+      }).join(''));
+      
+      if (iteration >= text.length) clearInterval(interval);
+      iteration += 1 / 3;
+    }, 30);
+    return () => clearInterval(interval);
+  }, [inView, text]);
+
+  return <span ref={ref} className={className}>{display}</span>;
+};
 
 const Home = () => {
   const { t } = useLanguage();
@@ -37,45 +69,92 @@ const Home = () => {
         <TerminalSimulator />
       </section>
 
-      {/* Bento Grid Features */}
-      <section className="flex flex-col gap-8">
-        <div className="text-center max-w-2xl mx-auto mb-8">
-          <h2 className="text-3xl font-bold mb-4">{t('engineered')}</h2>
-          <p className="text-on-surface">{t('engineered_desc')}</p>
+      {/* Hacker Architecture & Info Matrix */}
+      <section className="flex flex-col gap-12 mt-12 relative">
+        <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary to-transparent opacity-30"></div>
+        
+        <div className="pl-8 relative">
+          <div className="absolute left-[-4px] top-2 w-2 h-2 bg-primary animate-ping rounded-full"></div>
+          <h2 className="text-3xl font-bold mb-4 font-mono uppercase text-white tracking-widest"><DecryptText text={t('engineered')} /></h2>
+          <p className="text-on-surface max-w-3xl border-l-2 border-primary/50 pl-4 py-2 font-mono text-sm bg-primary/5">
+            {t('engineered_desc')}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <motion.div whileHover={{ y: -5 }} className="col-span-1 md:col-span-2 bg-surface border border-border p-6 rounded-lg shadow-lg hover:border-primary transition-colors group">
-            <div className="w-10 h-10 bg-primary-dim rounded flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
-              <Terminal size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">CLI Command Engine</h3>
-            <p className="text-on-background">Launch applications, pin items to dock containers, switch theme schemes, create folder directories, and query web information in real-time. Features a command parsing architecture with fuzzy auto-matching.</p>
-          </motion.div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 pl-8">
+          
+          {/* Core Modules List */}
+          <div className="flex flex-col gap-6">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+              className="border-l-4 border-primary bg-gradient-to-r from-primary/10 to-transparent p-6 group"
+            >
+              <div className="flex items-center gap-3 text-primary mb-2">
+                <Terminal size={20} /> <h3 className="text-lg font-bold font-mono tracking-wider">CLI ENGINE_</h3>
+              </div>
+              <p className="text-on-background text-sm font-mono leading-relaxed">
+                Fuzzy-matching architecture capable of executing system directives, launching deep-linked apps, and manipulating state instantly. 
+                Zero-lag parsing achieved through coroutines.
+              </p>
+            </motion.div>
 
-          <motion.div whileHover={{ y: -5 }} className="col-span-1 bg-surface border border-border p-6 rounded-lg shadow-lg hover:border-primary transition-colors group">
-            <div className="w-10 h-10 bg-primary-dim rounded flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
-              <Zap size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Charging Overlay</h3>
-            <p className="text-on-background">Fully immersive screen charging overlay displaying ASCII levels and rendering a digital canvas rain backdrop.</p>
-          </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
+              className="border-l-4 border-cursor bg-gradient-to-r from-cursor/10 to-transparent p-6 group"
+            >
+              <div className="flex items-center gap-3 text-cursor mb-2">
+                <Shield size={20} /> <h3 className="text-lg font-bold font-mono tracking-wider">SECURITY.SYS_</h3>
+              </div>
+              <p className="text-on-background text-sm font-mono leading-relaxed">
+                Passive environment auditing. Detects active ADB debug states, root binaries (`su`), and evaluates device lock integrity. 
+                Includes a built-in cryptographic token generator.
+              </p>
+            </motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
+              className="border-l-4 border-prompt bg-gradient-to-r from-prompt/10 to-transparent p-6 group"
+            >
+              <div className="flex items-center gap-3 text-prompt mb-2">
+                <Database size={20} /> <h3 className="text-lg font-bold font-mono tracking-wider">SMART CACHE_</h3>
+              </div>
+              <p className="text-on-background text-sm font-mono leading-relaxed">
+                A localized neural-like decay algorithm ranks your apps. Apps you use drop in priority if ignored over time. Stored efficiently in DataStore.
+              </p>
+            </motion.div>
+          </div>
 
-          <motion.div whileHover={{ y: -5 }} className="col-span-1 bg-surface border border-border p-6 rounded-lg shadow-lg hover:border-primary transition-colors group">
-            <div className="w-10 h-10 bg-primary-dim rounded flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
-              <Activity size={24} />
+          {/* DDD Architecture Tree */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2 text-on-surface font-mono text-sm border-b border-border pb-2">
+              <Cpu size={16} /> SYSTEM ARCHITECTURE [DDD + CLEAN]
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Smart Ranking</h3>
-            <p className="text-on-background">Apps automatically rank in the app drawer list based on recent use frequencies decay-weighted over time.</p>
-          </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+              className="font-mono text-xs sm:text-sm border border-border bg-[#050505] p-5 rounded text-primary-dim shadow-inner overflow-x-auto relative"
+            >
+              <div className="absolute top-0 right-0 p-2 opacity-20"><Lock size={40} /></div>
+              <div className="text-primary font-bold mb-3 drop-shadow-[0_0_5px_var(--primary)]">[/] tensor/app/src/main/java</div>
+              <div className="pl-2 sm:pl-4 border-l border-primary/30 flex flex-col gap-1">
+                <div className="text-on-bg hover:text-white transition-colors cursor-crosshair">├── domain/ <span className="opacity-50 text-xs">// 0 Android Dependencies</span></div>
+                <div className="pl-6 opacity-80">│   ├── model/       <span className="opacity-50"># Core entities</span></div>
+                <div className="pl-6 opacity-80">│   ├── repository/  <span className="opacity-50"># Ports (Interfaces)</span></div>
+                <div className="pl-6 opacity-80">│   └── usecase/     <span className="opacity-50"># Business logic</span></div>
+                <div className="text-on-bg hover:text-white transition-colors mt-2 cursor-crosshair">├── data/ <span className="opacity-50 text-xs">// Adapters</span></div>
+                <div className="pl-6 opacity-80">│   ├── repository/  <span className="opacity-50"># Implementations</span></div>
+                <div className="pl-6 opacity-80">│   └── local/       <span className="opacity-50"># Room / DataStore</span></div>
+                <div className="text-on-bg hover:text-white transition-colors mt-2 cursor-crosshair">└── presentation/ <span className="opacity-50 text-xs">// UI Layer</span></div>
+                <div className="pl-6 opacity-80">    ├── ui/          <span className="opacity-50"># Jetpack Compose UI</span></div>
+                <div className="pl-6 opacity-80">    └── viewmodel/   <span className="opacity-50"># State holders</span></div>
+              </div>
+            </motion.div>
+            
+            <div className="mt-4 border border-border bg-surface p-4 text-xs font-mono text-on-surface">
+              <span className="text-primary animate-pulse inline-block mr-2">●</span> 
+              Live Memory Diagnostics: Optimal. Garbage Collector cycles reduced by 40% due to strictly scoped ViewModels.
+            </div>
+          </div>
 
-          <motion.div whileHover={{ y: -5 }} className="col-span-1 md:col-span-2 bg-surface border border-border p-6 rounded-lg shadow-lg hover:border-primary transition-colors group">
-            <div className="w-10 h-10 bg-primary-dim rounded flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
-              <Shield size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Security Toolkit</h3>
-            <p className="text-on-background">Check security flags such as active screen locks, adb configurations, dev mode state, and su root binaries. Includes a secure passphrase generator with custom character classes avoiding ambiguous glyphs.</p>
-          </motion.div>
         </div>
       </section>
 

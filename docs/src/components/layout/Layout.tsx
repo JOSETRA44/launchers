@@ -31,7 +31,8 @@ const MatrixBackground = () => {
     const primaryColor = getPrimaryColor();
 
     const draw = () => {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      // FIX: Increase matrix trail length by reducing alpha clear
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.03)';
       ctx.fillRect(0, 0, width, height);
       
       ctx.fillStyle = primaryColor;
@@ -64,7 +65,7 @@ const MatrixBackground = () => {
     };
   }, [theme]); // Re-run effect exclusively when theme updates
 
-  return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10 opacity-5" />;
+  return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10 opacity-20" />;
 };
 
 const Layout = () => {
