@@ -37,7 +37,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tien.tensor.di.AppModule
 import com.tien.tensor.domain.model.AppInfo
-import com.tien.tensor.domain.model.NetworkType
 import com.tien.tensor.domain.model.SmartApp
 import com.tien.tensor.presentation.navigation.AppDestination
 import com.tien.tensor.ui.component.TerminalButton
@@ -118,30 +117,7 @@ fun LauncherScreen(
         ) {
             Spacer(Modifier.height(TensorSpacing.sm))
 
-            // Terminal status bar
-            val bat = state.systemStatus
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    text  = "BAT:${bat.batteryPercent}%${if (bat.isCharging) " CHG" else ""}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = when {
-                        bat.batteryPercent <= 15 -> colors.error
-                        bat.batteryPercent <= 30 -> colors.primaryDim
-                        else                     -> colors.terminalPrompt
-                    }
-                )
-                Text(
-                    text  = when (bat.networkType) {
-                        NetworkType.WIFI   -> "WIFI"
-                        NetworkType.MOBILE -> "MOBILE"
-                        NetworkType.NONE   -> "NO NET"
-                    },
-                    style = MaterialTheme.typography.labelSmall,
-                    color = colors.terminalPrompt
-                )
-            }
-
-            Spacer(Modifier.height(TensorSpacing.xs))
+            // Battery/network now live in the global TensorStatusBar (MainActivity)
             TypewriterText(fullText = "TENSOR OS [v1.0.0] — READY", style = MaterialTheme.typography.labelMedium, color = colors.primary)
             Spacer(Modifier.height(TensorSpacing.xs))
             TerminalPromptHeader(path = "home")

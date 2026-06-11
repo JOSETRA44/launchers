@@ -69,6 +69,7 @@ import com.tien.tensor.presentation.insights.InsightsViewModel
 import com.tien.tensor.presentation.launcher.LauncherViewModel
 import com.tien.tensor.presentation.security.SecurityViewModel
 import com.tien.tensor.presentation.settings.SettingsViewModel
+import com.tien.tensor.presentation.statusbar.StatusBarViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -190,6 +191,10 @@ object AppModule {
 
     fun insightsViewModelFactory() = factory {
         InsightsViewModel(getUsageStatsUseCase, getStepsUseCase)
+    }
+
+    fun statusBarViewModelFactory() = factory {
+        StatusBarViewModel(getSystemStatusUseCase)
     }
 
     @Suppress("UNCHECKED_CAST")
