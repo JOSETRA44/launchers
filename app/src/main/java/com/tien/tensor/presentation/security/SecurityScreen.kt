@@ -20,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.tien.tensor.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tien.tensor.di.AppModule
 import com.tien.tensor.domain.model.CheckStatus
@@ -57,20 +59,20 @@ fun SecurityScreen(
 
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             TerminalPromptHeader(path = "security")
-            TerminalButton(label = "BACK", onClick = onNavigateBack)
+            TerminalButton(label = stringResource(R.string.common_back), onClick = onNavigateBack)
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // Gateway to the modular security arsenal (/arsenal)
-        TerminalButton(label = "▸ OPEN SECURITY ARSENAL", onClick = onOpenArsenal, modifier = Modifier.fillMaxWidth())
+        TerminalButton(label = stringResource(R.string.security_open_arsenal), onClick = onOpenArsenal, modifier = Modifier.fillMaxWidth())
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // ── Device audit ──────────────────────────────────────────────────────
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            TerminalSectionLabel(label = "DEVICE AUDIT" + if (state.report.warningCount > 0) " — ${state.report.warningCount} WARN" else "")
-            TerminalButton(label = if (state.isLoading) "..." else "RESCAN", onClick = viewModel::refreshAudit)
+            TerminalSectionLabel(label = stringResource(R.string.security_device_audit) + if (state.report.warningCount > 0) " — ${state.report.warningCount} WARN" else "")
+            TerminalButton(label = if (state.isLoading) "..." else stringResource(R.string.common_rescan), onClick = viewModel::refreshAudit)
         }
         Spacer(Modifier.height(TensorSpacing.sm))
         state.report.checks.forEach { check ->
@@ -81,7 +83,7 @@ fun SecurityScreen(
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // ── Password generator ────────────────────────────────────────────────
-        TerminalSectionLabel(label = "PASSWORD GENERATOR")
+        TerminalSectionLabel(label = stringResource(R.string.security_password_generator))
         Spacer(Modifier.height(TensorSpacing.sm))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
             PASSWORD_LENGTHS.forEach { len ->
@@ -94,19 +96,19 @@ fun SecurityScreen(
             }
         }
         Spacer(Modifier.height(TensorSpacing.xs))
-        TerminalButton(label = "GENERATE", onClick = viewModel::onGeneratePassword, modifier = Modifier.fillMaxWidth())
+        TerminalButton(label = stringResource(R.string.security_generate), onClick = viewModel::onGeneratePassword, modifier = Modifier.fillMaxWidth())
         if (state.generatedPassword.isNotEmpty()) {
             Spacer(Modifier.height(TensorSpacing.xs))
             SelectionContainer {
                 Text(text = "> ${state.generatedPassword}", style = MaterialTheme.typography.bodyMedium, color = colors.primary)
             }
-            Text(text = "Long-press to copy", style = MaterialTheme.typography.labelSmall, color = colors.onSurface)
+            Text(text = stringResource(R.string.security_copy_hint), style = MaterialTheme.typography.labelSmall, color = colors.onSurface)
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // ── Hash tool ─────────────────────────────────────────────────────────
-        TerminalSectionLabel(label = "HASH TOOL — SHA-256")
+        TerminalSectionLabel(label = stringResource(R.string.security_hash_tool) + " — SHA-256")
         Spacer(Modifier.height(TensorSpacing.sm))
         TerminalSearchField(
             query         = state.hashInput,

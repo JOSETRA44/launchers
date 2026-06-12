@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.tien.tensor.R
 import com.tien.tensor.domain.model.Finding
 import com.tien.tensor.domain.model.ModuleMeta
 import com.tien.tensor.domain.model.ModuleReport
@@ -41,14 +43,14 @@ fun ArsenalDetailPanel(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        TerminalButton(label = "< MODULES", onClick = onClose)
+        TerminalButton(label = stringResource(R.string.arsenal_modules_back), onClick = onClose)
         if (meta.isStreaming) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "LIVE ", style = MaterialTheme.typography.labelSmall, color = colors.cursor)
+                Text(text = stringResource(R.string.arsenal_live) + " ", style = MaterialTheme.typography.labelSmall, color = colors.cursor)
                 BlinkingCursor()
             }
         } else {
-            TerminalButton(label = if (scanning) "SCANNING.." else "RESCAN", onClick = onRescan)
+            TerminalButton(label = if (scanning) stringResource(R.string.arsenal_scanning) else stringResource(R.string.common_rescan), onClick = onRescan)
         }
     }
 
@@ -65,9 +67,9 @@ fun ArsenalDetailPanel(
 
     when {
         report == null && scanning ->
-            Text(text = "> running analysis...", style = MaterialTheme.typography.bodySmall, color = colors.onBackground)
+            Text(text = stringResource(R.string.arsenal_running), style = MaterialTheme.typography.bodySmall, color = colors.onBackground)
         report == null ->
-            Text(text = "> no data.", style = MaterialTheme.typography.bodySmall, color = colors.onSurface)
+            Text(text = stringResource(R.string.arsenal_no_data), style = MaterialTheme.typography.bodySmall, color = colors.onSurface)
         else ->
             LazyColumn {
                 items(report.findings, key = { it.id }) { finding ->

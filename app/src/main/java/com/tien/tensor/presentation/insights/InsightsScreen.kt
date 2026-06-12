@@ -31,7 +31,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import com.tien.tensor.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -92,24 +94,24 @@ fun InsightsScreen(
 
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             TerminalPromptHeader(path = "insights")
-            TerminalButton(label = "BACK", onClick = onNavigateBack)
+            TerminalButton(label = stringResource(R.string.common_back), onClick = onNavigateBack)
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // ── Screen time ───────────────────────────────────────────────────────
-        TerminalSectionLabel(label = "SCREEN TIME — TODAY")
+        TerminalSectionLabel(label = stringResource(R.string.insights_screen_time))
         Spacer(Modifier.height(TensorSpacing.sm))
 
         if (!state.hasUsagePermission) {
             Text(
-                text  = "Usage access is required to show where your time goes.",
+                text  = stringResource(R.string.insights_usage_rationale),
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.onBackground
             )
             Spacer(Modifier.height(TensorSpacing.xs))
             TerminalButton(
-                label    = "GRANT USAGE ACCESS",
+                label    = stringResource(R.string.insights_grant_usage),
                 onClick  = {
                     val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -119,13 +121,13 @@ fun InsightsScreen(
             )
         } else {
             Text(
-                text  = "TOTAL: ${formatDuration(state.totalScreenTimeMs)}",
+                text  = stringResource(R.string.insights_total, formatDuration(state.totalScreenTimeMs)),
                 style = MaterialTheme.typography.titleMedium,
                 color = colors.primary
             )
             Spacer(Modifier.height(TensorSpacing.sm))
             if (state.usageStats.isEmpty()) {
-                Text(text = "No usage recorded yet today.", style = MaterialTheme.typography.bodySmall, color = colors.onSurface)
+                Text(text = stringResource(R.string.insights_no_usage), style = MaterialTheme.typography.bodySmall, color = colors.onSurface)
             } else {
                 val maxTime = state.usageStats.first().totalTimeMs
                 state.usageStats.forEach { stat ->
@@ -138,28 +140,28 @@ fun InsightsScreen(
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
         // ── Steps ─────────────────────────────────────────────────────────────
-        TerminalSectionLabel(label = "STEPS — TODAY")
+        TerminalSectionLabel(label = stringResource(R.string.insights_steps))
         Spacer(Modifier.height(TensorSpacing.sm))
 
         when {
             !hasStepsPermission -> {
                 Text(
-                    text  = "Physical activity permission is required to count steps.",
+                    text  = stringResource(R.string.insights_steps_rationale),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.onBackground
                 )
                 Spacer(Modifier.height(TensorSpacing.xs))
                 TerminalButton(
-                    label    = "GRANT ACTIVITY ACCESS",
+                    label    = stringResource(R.string.insights_grant_activity),
                     onClick  = { permissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
             !state.steps.sensorAvailable ->
-                Text(text = "No step sensor on this device.", style = MaterialTheme.typography.bodySmall, color = colors.onSurface)
+                Text(text = stringResource(R.string.insights_no_sensor), style = MaterialTheme.typography.bodySmall, color = colors.onSurface)
             else -> {
                 Text(text = "${state.steps.stepsToday}", style = MaterialTheme.typography.displayMedium, color = colors.primary)
-                Text(text = "steps since midnight", style = MaterialTheme.typography.labelSmall, color = colors.onSurface)
+                Text(text = stringResource(R.string.insights_steps_since_midnight), style = MaterialTheme.typography.labelSmall, color = colors.onSurface)
             }
         }
 

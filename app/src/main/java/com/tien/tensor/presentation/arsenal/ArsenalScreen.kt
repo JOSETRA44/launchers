@@ -20,7 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tien.tensor.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tien.tensor.di.AppModule
@@ -60,12 +62,12 @@ fun ArsenalScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TerminalPromptHeader(path = "arsenal")
-            TerminalButton(label = "BACK", onClick = onNavigateBack)
+            TerminalButton(label = stringResource(R.string.common_back), onClick = onNavigateBack)
         }
 
         Spacer(Modifier.height(TensorSpacing.xs))
         Text(
-            text  = "DEFENSIVE MODULES · LOCAL ONLY · READ-ONLY",
+            text  = stringResource(R.string.arsenal_subtitle),
             style = MaterialTheme.typography.labelSmall,
             color = colors.onSurface
         )
@@ -122,7 +124,7 @@ private fun ModuleCard(
                 Text(text = "▸ ${meta.name}", style = MaterialTheme.typography.titleSmall, color = colors.primary)
                 if (meta.isStreaming) {
                     Spacer(Modifier.padding(start = TensorSpacing.xs))
-                    Text(text = "● LIVE", style = MaterialTheme.typography.labelSmall, color = colors.cursor)
+                    Text(text = stringResource(R.string.arsenal_live), style = MaterialTheme.typography.labelSmall, color = colors.cursor)
                 }
             }
             ModuleBadge(report = report, scanning = scanning)
@@ -141,9 +143,9 @@ private fun ModuleBadge(report: ModuleReport?, scanning: Boolean) {
     val colors = LauncherTheme.colors
     val worst  = report?.worstSeverity
     val (label, color) = when {
-        scanning && report == null               -> "[SCANNING]" to colors.onBackground
+        scanning && report == null               -> stringResource(R.string.arsenal_badge_scanning) to colors.onBackground
         report == null                           -> "[--]" to colors.onSurface
-        worst == null || worst == Severity.INFO  -> "[CLEAN]" to colors.primary
+        worst == null || worst == Severity.INFO  -> stringResource(R.string.arsenal_badge_clean) to colors.primary
         else                                     -> "[${worst.name}]" to severityColor(worst)
     }
     Text(text = label, style = MaterialTheme.typography.labelSmall, color = color)
