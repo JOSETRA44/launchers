@@ -39,7 +39,7 @@ com.tien.tensor/
 │   └── component/      BlinkingCursor · TypewriterText · AppIcon · TerminalComponents
 │
 ├── presentation/
-│   ├── navigation/     AppDestination (HOME · APP_LIST · SETTINGS)
+│   ├── navigation/     AppDestination (HOME · APP_LIST · SETTINGS · SECURITY · ARSENAL · INSIGHTS)
 │   ├── launcher/       LauncherScreen · LauncherViewModel · LauncherUiState
 │   ├── applist/        AppListScreen · AppListViewModel · AppListUiState
 │   └── settings/       SettingsScreen · SettingsViewModel · SettingsUiState
@@ -67,8 +67,17 @@ No annotation processing overhead for a launcher. `AppModule` is a plain `object
 ### Multi-Theme via CompositionLocal
 `TensorTheme(themeId)` wraps both a `MaterialTheme` (so standard Compose components work) and `CompositionLocalProvider(LocalLauncherColors provides ...)` (so custom components get our tokens). Theme changes in `SettingsViewModel` propagate instantly via `StateFlow → collectAsStateWithLifecycle` in `MainActivity`.
 
-### State-Based Navigation
-Three screens are managed with `rememberSaveable { mutableStateOf(AppDestination.HOME) }` in `MainActivity`. Survives configuration changes without a NavController. Simple, zero-overhead for a 3-screen app.
+### State-Based Navigation (saveable back stack)
+Screens are managed in `MainActivity` by a plain saveable stack of
+`AppDestination` (`rememberSaveable(listSaver) { mutableStateListOf(HOME) }`)
+— no NavController. `HOME` is the permanent root: navigating to it resets the
+stack; `navigateBack()` pops one entry. **Single back semantics:** the system
+back gesture (activity-level `BackHandler`) and every visual `[BACK]` button
+call the same `navigateBack()`, so they can never diverge. Screens with
+internal layers register their own `BackHandler(enabled = …)` — innermost
+wins — so back peels one layer at a time: arsenal detail panel → arsenal hub
+→ previous screen; home overlays (charging / folder / help) close before the
+press is swallowed at HOME. Survives configuration changes.
 
 ### Terminal Animations
 | Effect | Implementation |

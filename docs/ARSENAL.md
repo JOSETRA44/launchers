@@ -43,6 +43,17 @@ The hub discovers it automatically (cards render from `registry.all()`).
 `Dispatchers.IO`. Reports land in a single `StateFlow<ArsenalUiState>` keyed
 by module id; severity badges on the hub update in real time.
 
+**Job lifecycle is bound to screen visibility, not the ViewModel.** The
+ViewModel is activity-scoped, so `ArsenalScreen` drives it through a
+`DisposableEffect`: `onScreenEnter()` (re)starts every plugin job on entry;
+`onScreenExit()` cancels all jobs and clears transient state (scanning set,
+selected detail) when the screen leaves the composition. Nothing streams in
+the background after navigating away, and re-entry always lands on the hub —
+cached reports are kept so cards show data instantly while fresh scans run.
+While a detail panel is open, the system back gesture closes it (screen-local
+`BackHandler`) exactly like the `[BACK]` button; only from the hub does back
+leave the screen.
+
 ## Built-in modules
 
 | Module | Mode | What it does |
