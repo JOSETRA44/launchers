@@ -21,14 +21,13 @@ const Footer = () => {
           <h4 className="text-white font-bold mb-2">SYSTEM_LINKS</h4>
           <Link to="/" className="text-primary-dim hover:text-primary transition-colors">[/] Root (Home)</Link>
           <Link to="/resenas" className="text-primary-dim hover:text-primary transition-colors">[/] Reviews</Link>
-          <Link to="/version" className="text-primary-dim hover:text-primary transition-colors">[/] Changelog</Link>
+          <a href="https://github.com/JOSETRA44/launchers/releases/" target="_blank" rel="noopener noreferrer" className="text-primary-dim hover:text-primary transition-colors">[/] Changelog (Releases)</a>
         </div>
 
         <div className="flex flex-col gap-3">
           <h4 className="text-white font-bold mb-2">NETWORK</h4>
-          <a href="#" className="flex items-center gap-2 text-primary-dim hover:text-primary transition-colors"><FolderGit2 size={16}/> GitHub Repo</a>
-          <a href="#" className="flex items-center gap-2 text-primary-dim hover:text-primary transition-colors"><MessageSquare size={16}/> Forums / Comm</a>
-          <a href="#" className="flex items-center gap-2 text-primary-dim hover:text-primary transition-colors"><Mail size={16}/> Contact_Sysadmin</a>
+          <a href="https://github.com/JOSETRA44/launchers" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary-dim hover:text-primary transition-colors"><FolderGit2 size={16}/> GitHub Repo</a>
+          <a href="https://github.com/JOSETRA44/launchers/releases/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary-dim hover:text-primary transition-colors"><MessageSquare size={16}/> Releases & APKs</a>
         </div>
       </div>
       

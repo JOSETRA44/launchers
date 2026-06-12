@@ -56,12 +56,12 @@ const Home = () => {
             {t('hero_desc')}
           </p>
           <div className="flex flex-wrap gap-4 mt-4">
-            <button className="bg-primary text-black font-mono px-6 py-3 rounded font-semibold hover:bg-cursor transition-colors shadow-[0_4px_14px_rgba(0,255,65,0.15)] hover:shadow-[0_6px_20px_rgba(0,255,65,0.35)] flex items-center gap-2">
+            <a href="https://github.com/JOSETRA44/launchers/releases/" target="_blank" rel="noopener noreferrer" className="bg-primary text-black font-mono px-6 py-3 rounded font-semibold hover:bg-cursor transition-colors shadow-[0_4px_14px_rgba(0,255,65,0.15)] hover:shadow-[0_6px_20px_rgba(0,255,65,0.35)] flex items-center gap-2">
               <Terminal size={18} /> {t('btn_terminal')}
-            </button>
-            <button className="border border-border text-primary font-mono px-6 py-3 rounded hover:bg-primary/10 transition-colors flex items-center gap-2">
+            </a>
+            <a href="https://github.com/JOSETRA44/launchers" target="_blank" rel="noopener noreferrer" className="border border-border text-primary font-mono px-6 py-3 rounded hover:bg-primary/10 transition-colors flex items-center gap-2">
               <FolderGit2 size={18} /> {t('btn_github')}
-            </button>
+            </a>
           </div>
         </div>
 

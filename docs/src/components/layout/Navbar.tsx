@@ -7,9 +7,9 @@ const Navbar = () => {
   const { t, lang, setLang } = useLanguage();
 
   const navItems = [
-    { name: t('nav_home'), path: '/', icon: <Terminal size={18} /> },
-    { name: t('nav_reviews'), path: '/resenas', icon: <Star size={18} /> },
-    { name: t('nav_changelog'), path: '/version', icon: <Clock size={18} /> },
+    { name: t('nav_home'), path: '/', icon: <Terminal size={18} />, isExternal: false },
+    { name: t('nav_reviews'), path: '/resenas', icon: <Star size={18} />, isExternal: false },
+    { name: t('nav_changelog'), path: 'https://github.com/JOSETRA44/launchers/releases/', icon: <Clock size={18} />, isExternal: true },
   ];
 
   return (
@@ -28,14 +28,21 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-6 font-mono text-sm">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
+            const classes = `flex items-center gap-2 transition-colors ${
+              isActive ? 'text-primary' : 'text-on-background hover:text-primary'
+            }`;
+
+            if (item.isExternal) {
+              return (
+                <a key={item.path} href={item.path} target="_blank" rel="noopener noreferrer" className={classes}>
+                  {item.icon}
+                  {item.name}
+                </a>
+              );
+            }
+
             return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-2 transition-colors ${
-                  isActive ? 'text-primary' : 'text-on-background hover:text-primary'
-                }`}
-              >
+              <Link key={item.path} to={item.path} className={classes}>
                 {item.icon}
                 {item.name}
               </Link>
