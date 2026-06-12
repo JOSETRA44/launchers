@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,7 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.tien.tensor.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tien.tensor.di.AppModule
 import com.tien.tensor.domain.model.AppInfo
@@ -42,6 +45,9 @@ import com.tien.tensor.ui.theme.LauncherTheme
 import com.tien.tensor.ui.theme.TensorSpacing
 import kotlinx.coroutines.delay
 
+// stickyHeader is still experimental in foundation; release builds treat the
+// missing opt-in as an error.
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppListScreen(
     onNavigateBack: () -> Unit,
@@ -72,7 +78,7 @@ fun AppListScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TerminalPromptHeader(path = "apps")
-            TerminalButton(label = "BACK", onClick = onNavigateBack)
+            TerminalButton(label = stringResource(R.string.common_back), onClick = onNavigateBack)
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
