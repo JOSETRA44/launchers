@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './Navbar';
+import Footer from './Footer';
 import { useTheme } from '../ThemeProvider';
 
 const MatrixBackground = () => {
@@ -99,10 +100,7 @@ const Layout = () => {
           </motion.div>
         </AnimatePresence>
       </main>
-      <footer className="py-8 border-t border-border mt-16 text-center text-on-surface text-sm font-mono">
-        <p>Tensor Launcher is open-source. Licensed under Apache 2.0.</p>
-        <p className="opacity-50 text-[10px] mt-2">SYSTEM DIRECTIVE: guest@tensor:~$ /shutdown</p>
-      </footer>
+      <Footer />
     </div>
   );
 };

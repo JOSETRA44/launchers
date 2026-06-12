@@ -39,7 +39,7 @@ const Home = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="py-12 flex flex-col gap-24">
+    <main className="py-12 flex flex-col gap-24">
       {/* Hero Section */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div className="flex flex-col gap-6">
@@ -158,24 +158,38 @@ const Home = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="flex flex-col gap-8">
-        <div className="flex items-center gap-3 mb-4 border-b border-border pb-4">
-          <HelpCircle className="text-primary" size={28} />
-          <h2 className="text-3xl font-bold">{t('faq_title')}</h2>
+      {/* FAQ Section (Optimized for Hacker aesthetic & SEO) */}
+      <section className="flex flex-col gap-8 mt-12 relative z-10">
+        <div className="flex items-center gap-3 mb-4 border-b border-primary/30 pb-4">
+          <HelpCircle className="text-primary animate-pulse" size={28} />
+          <h2 className="text-3xl font-bold font-mono tracking-widest text-white">{t('faq_title')}</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-surface border border-border p-6 rounded-lg shadow-lg hover:border-primary transition-colors">
-            <h3 className="text-xl font-bold text-white mb-2">{t('faq_1_q')}</h3>
-            <p className="text-on-background leading-relaxed">{t('faq_1_a')}</p>
-          </div>
-          <div className="bg-surface border border-border p-6 rounded-lg shadow-lg hover:border-primary transition-colors">
-            <h3 className="text-xl font-bold text-white mb-2">{t('faq_2_q')}</h3>
-            <p className="text-on-background leading-relaxed">{t('faq_2_a')}</p>
-          </div>
+        
+        <div className="grid grid-cols-1 gap-6">
+          <article className="border-l-2 border-primary bg-black/60 p-6 relative overflow-hidden group hover:bg-black/80 transition-colors">
+            <div className="absolute top-0 right-0 p-2 opacity-5 font-mono text-6xl select-none pointer-events-none">?</div>
+            <h3 className="text-xl font-bold text-primary mb-3 font-mono flex items-center gap-2">
+              <span className="text-on-surface opacity-50">Q:/&gt;</span> {t('faq_1_q')}
+            </h3>
+            <p className="text-on-background leading-relaxed font-mono text-sm sm:text-base pl-4 sm:pl-8 border-l border-border/50">
+              <span className="text-cursor mr-2 opacity-80">[SYS_REPLY]</span> 
+              {t('faq_1_a')}
+            </p>
+          </article>
+          
+          <article className="border-l-2 border-cursor bg-black/60 p-6 relative overflow-hidden group hover:bg-black/80 transition-colors">
+            <div className="absolute top-0 right-0 p-2 opacity-5 font-mono text-6xl select-none pointer-events-none">?</div>
+            <h3 className="text-xl font-bold text-cursor mb-3 font-mono flex items-center gap-2">
+              <span className="text-on-surface opacity-50">Q:/&gt;</span> {t('faq_2_q')}
+            </h3>
+            <p className="text-on-background leading-relaxed font-mono text-sm sm:text-base pl-4 sm:pl-8 border-l border-border/50">
+              <span className="text-primary mr-2 opacity-80">[SYS_REPLY]</span> 
+              {t('faq_2_a')}
+            </p>
+          </article>
         </div>
       </section>
-    </div>
+    </main>
   );
 };
 
