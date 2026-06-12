@@ -1,5 +1,6 @@
 package com.tien.tensor.presentation.launcher
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -61,6 +62,17 @@ fun LauncherScreen(
 
     LaunchedEffect(viewModel) {
         viewModel.navigationEvents.collect { dest -> onNavigate(dest) }
+    }
+
+    // System back peels home overlays one at a time — exactly the same state
+    // change as their tap-to-dismiss action — instead of being swallowed by
+    // the activity-level handler. Priority mirrors the render order below.
+    BackHandler(enabled = state.showChargingOverlay || state.activeFolderId != null || state.showHelp) {
+        when {
+            state.showChargingOverlay    -> viewModel.onDismissChargingOverlay()
+            state.activeFolderId != null -> viewModel.onCloseFolderOverlay()
+            else                         -> viewModel.onDismissHelp()
+        }
     }
 
     // Charging overlay takes precedence over everything

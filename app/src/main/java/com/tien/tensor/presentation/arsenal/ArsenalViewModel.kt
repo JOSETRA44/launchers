@@ -27,9 +27,15 @@ data class ArsenalUiState(
 
 /**
  * Drives the arsenal hub. Every registered plugin gets its own collection
- * job: one-shot modules run once on entry (re-run via [rescan]); streaming
- * modules keep emitting while the ViewModel lives. Jobs are independent —
- * a slow scan never blocks live telemetry.
+ * job: one-shot modules run once per screen entry (re-run via [rescan]);
+ * streaming modules keep emitting while the screen is visible. Jobs are
+ * independent — a slow scan never blocks live telemetry.
+ *
+ * The ViewModel is activity-scoped (it outlives the screen), so the screen
+ * drives the job lifecycle explicitly via [onScreenEnter]/[onScreenExit]:
+ * without that, streaming modules would keep polling forever after the user
+ * navigates away (battery drain) and a previously opened detail panel would
+ * reappear as a ghost state on re-entry.
  */
 class ArsenalViewModel(
     private val getArsenalModulesUseCase: GetArsenalModulesUseCase,
@@ -42,9 +48,23 @@ class ArsenalViewModel(
     private val jobs = mutableMapOf<String, Job>()
 
     init {
-        val modules = getArsenalModulesUseCase()
-        _state.update { it.copy(modules = modules) }
-        modules.forEach { startModule(it.id) }
+        _state.update { it.copy(modules = getArsenalModulesUseCase()) }
+    }
+
+    /** Screen became visible: (re)start every plugin job. Idempotent per entry. */
+    fun onScreenEnter() {
+        _state.value.modules.forEach { startModule(it.id) }
+    }
+
+    /**
+     * Screen left the composition: cancel every job and clear transient UI
+     * state. Cached reports are kept so re-entry shows data instantly while
+     * the fresh scans run.
+     */
+    fun onScreenExit() {
+        jobs.values.forEach(Job::cancel)
+        jobs.clear()
+        _state.update { it.copy(scanningIds = emptySet(), selectedModuleId = null) }
     }
 
     fun rescan(moduleId: String) = startModule(moduleId)

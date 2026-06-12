@@ -34,7 +34,7 @@
     <string name="help_bar">Tamaño de la barra de estado</string>
     <string name="help_font">Escala de fuente (90–125)</string>
     <string name="help_clock">Formato del reloj</string>
-    <string name="help_margin">Margen de seguridad en dp (bordes físicos)</string>
+    <string name="help_margin">Margen del borde en dp; negativo lo pega al borde</string>
     <string name="help_lang">Idioma: en / es / system</string>
     <string name="help_settings">Abrir ajustes</string>
     <string name="help_apps">Abrir lista de apps</string>
@@ -52,7 +52,7 @@
     <string name="settings_font_size">TAMAÑO DE FUENTE</string>
     <string name="settings_clock">RELOJ</string>
     <string name="settings_spacing">ESPACIADO — BORDES FÍSICOS</string>
-    <string name="settings_spacing_hint">Aleja la interfaz de fundas, cristales curvos o protectores. Vista previa en vivo.</string>
+    <string name="settings_spacing_hint">Positivo: aleja la interfaz de fundas o cristales curvos. Negativo: la acerca más allá del margen del sistema, pegada al borde físico. Vista previa en vivo.</string>
     <string name="settings_margin_top">MARGEN SUPERIOR</string>
     <string name="settings_margin_bottom">MARGEN INFERIOR</string>
     <string name="settings_language">IDIOMA</string>

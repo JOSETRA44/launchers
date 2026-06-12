@@ -16,15 +16,20 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -82,32 +87,65 @@ class MainActivity : ComponentActivity() {
                 val colors = LauncherTheme.colors
 
                 // Boot screen shown once per process lifecycle (survives rotation via rememberSaveable)
-                var hasBooted   by rememberSaveable { mutableStateOf(false) }
-                var destination by rememberSaveable { mutableStateOf(AppDestination.HOME) }
+                var hasBooted by rememberSaveable { mutableStateOf(false) }
 
-                // Prevent the launcher from being closed by back press.
-                // On sub-screens, back returns to HOME; on HOME, the press is swallowed.
-                BackHandler {
-                    if (destination != AppDestination.HOME) destination = AppDestination.HOME
+                // ── Navigation back stack ────────────────────────────────
+                // A plain saveable stack (no NavController) with HOME as the
+                // permanent root. Both the system back gesture and every
+                // visual [BACK] button run navigateBack(), so they can never
+                // diverge — e.g. SECURITY → ARSENAL pops back to SECURITY.
+                val backStack = rememberSaveable(
+                    saver = listSaver(
+                        save    = { stack -> stack.map { it.name } },
+                        restore = { saved -> saved.map(AppDestination::valueOf).toMutableStateList() }
+                    )
+                ) { mutableStateListOf(AppDestination.HOME) }
+                val destination = backStack.last()
+
+                fun navigateTo(dest: AppDestination) {
+                    when {
+                        // HOME resets the stack: the launcher root never nests
+                        dest == AppDestination.HOME -> backStack.removeRange(1, backStack.size)
+                        // Ignore re-entrant taps to the current destination
+                        backStack.last() != dest    -> backStack.add(dest)
+                    }
                 }
+                fun navigateBack() {
+                    if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
+                }
+
+                // On HOME the press is swallowed (a launcher never closes itself).
+                // Screens with internal layers (arsenal detail, home overlays)
+                // register their own enabled-when-needed BackHandler, which
+                // takes precedence over this one.
+                BackHandler { navigateBack() }
+
+                // ── Spatial customization: signed margins vs system insets ──
+                // The user margin is SIGNED. The effective edge padding is
+                //   effective = max(0, systemInset + userMargin)
+                // so positive values push the UI away from physical edges
+                // (cases, curved glass, protectors) while negative values eat
+                // into the inset/cutout padding until the UI sits flush
+                // against the hardware edge. Clamping at 0 guarantees content
+                // is never pushed off-screen.
+                val density      = LocalDensity.current
+                val topInsets    = WindowInsets.statusBars.union(WindowInsets.displayCutout)
+                val bottomInsets = WindowInsets.navigationBars.union(WindowInsets.displayCutout)
+                val insetTopDp    = with(density) { topInsets.getTop(this).toDp() }
+                val insetBottomDp = with(density) { bottomInsets.getBottom(this).toDp() }
+                val effectiveTop    = (insetTopDp + settingsState.uiPrefs.marginTopDp.dp).coerceAtLeast(0.dp)
+                val effectiveBottom = (insetBottomDp + settingsState.uiPrefs.marginBottomDp.dp).coerceAtLeast(0.dp)
 
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(colors.background)
-                        // Keep the launcher's status bar clear of notches/punch-holes
-                        // (display cutout) and of the system bar if it ever returns.
-                        // Without this, devices with a camera cutout hide the bar.
-                        .windowInsetsPadding(
-                            WindowInsets.statusBars.union(WindowInsets.displayCutout)
-                                .only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
-                        )
-                        // User-defined safety margins for cases/curved edges/protectors
-                        // (Settings → SPACING, or /margin). Applied live.
-                        .padding(
-                            top    = settingsState.uiPrefs.marginTopDp.dp,
-                            bottom = settingsState.uiPrefs.marginBottomDp.dp
-                        )
+                        // Horizontal cutouts (landscape punch-holes) are never
+                        // user-overridable — content there is unreadable.
+                        .windowInsetsPadding(topInsets.only(WindowInsetsSides.Horizontal))
+                        // Vertical: inset + signed user margin, applied live
+                        // (Settings → SPACING, or /margin t|b ±dp).
+                        .padding(top = effectiveTop, bottom = effectiveBottom)
                 ) {
                     if (!hasBooted) {
                         BootScreen(onBootComplete = { hasBooted = true })
@@ -120,23 +158,23 @@ class MainActivity : ComponentActivity() {
                         ) {
                             when (destination) {
                                 AppDestination.HOME ->
-                                    LauncherScreen(onNavigate = { destination = it })
+                                    LauncherScreen(onNavigate = { navigateTo(it) })
                                 AppDestination.APP_LIST ->
-                                    AppListScreen(onNavigateBack = { destination = AppDestination.HOME })
+                                    AppListScreen(onNavigateBack = { navigateBack() })
                                 AppDestination.SETTINGS ->
                                     SettingsScreen(
-                                        onNavigateBack = { destination = AppDestination.HOME },
+                                        onNavigateBack = { navigateBack() },
                                         viewModel      = settingsViewModel
                                     )
                                 AppDestination.SECURITY ->
                                     SecurityScreen(
-                                        onNavigateBack = { destination = AppDestination.HOME },
-                                        onOpenArsenal  = { destination = AppDestination.ARSENAL }
+                                        onNavigateBack = { navigateBack() },
+                                        onOpenArsenal  = { navigateTo(AppDestination.ARSENAL) }
                                     )
                                 AppDestination.ARSENAL ->
-                                    ArsenalScreen(onNavigateBack = { destination = AppDestination.HOME })
+                                    ArsenalScreen(onNavigateBack = { navigateBack() })
                                 AppDestination.INSIGHTS ->
-                                    InsightsScreen(onNavigateBack = { destination = AppDestination.HOME })
+                                    InsightsScreen(onNavigateBack = { navigateBack() })
                             }
                         }
                     }

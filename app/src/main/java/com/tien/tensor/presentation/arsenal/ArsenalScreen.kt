@@ -1,5 +1,6 @@
 package com.tien.tensor.presentation.arsenal
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,6 +48,20 @@ fun ArsenalScreen(
 ) {
     val state  by viewModel.uiState.collectAsStateWithLifecycle()
     val colors = LauncherTheme.colors
+
+    // The ViewModel outlives this screen (activity scope): start the plugin
+    // jobs on entry and kill them on exit so nothing streams in the background.
+    DisposableEffect(viewModel) {
+        viewModel.onScreenEnter()
+        onDispose { viewModel.onScreenExit() }
+    }
+
+    // System back mirrors the [BACK] button of the detail panel: while a
+    // module is open it closes the panel; only from the hub does it leave
+    // the screen (handled by the activity-level BackHandler).
+    BackHandler(enabled = state.selectedModuleId != null) {
+        viewModel.onCloseDetail()
+    }
 
     Column(
         modifier = Modifier

@@ -77,7 +77,11 @@ class ParseCommandUseCase {
         else         -> CommandAction.Unknown("clock $arg")
     }
 
-    /** `/margin <t|b> <dp>` — manual safety margin against physical screen edges. */
+    /**
+     * `/margin <t|b> <±dp>` — signed margin against physical screen edges.
+     * Negative values compensate the system inset/cutout padding so the UI
+     * can sit flush against the hardware edge (effective padding never < 0).
+     */
     private fun parseMargin(arg: String): CommandAction {
         val parts = arg.trim().split("\\s+".toRegex())
         if (parts.size != 2) return CommandAction.Unknown("margin $arg")
@@ -87,7 +91,7 @@ class ParseCommandUseCase {
             else           -> return CommandAction.Unknown("margin $arg")
         }
         val dp = parts[1].toIntOrNull() ?: return CommandAction.Unknown("margin $arg")
-        return CommandAction.SetMargin(top, dp.coerceIn(0, UiPrefs.MARGIN_MAX_DP))
+        return CommandAction.SetMargin(top, dp.coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP))
     }
 
     private fun parseLanguage(arg: String): CommandAction {

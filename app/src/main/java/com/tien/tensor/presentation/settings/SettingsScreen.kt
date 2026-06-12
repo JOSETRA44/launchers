@@ -212,12 +212,17 @@ fun SettingsScreen(
     }
 }
 
-/** Stepper with a live block gauge: `TOP MARGIN  [-] ▓▓░░░░░░ 16 [+]`. */
+/**
+ * Stepper with a live signed gauge: `TOP MARGIN  [−] ██······ -16dp [+]`.
+ * The gauge shows the magnitude; the color carries the sign — primary while
+ * adding margin (pushing the UI inward), cursor color while negative
+ * (compensating the system inset so the UI hugs the hardware edge).
+ */
 @Composable
 private fun MarginStepperRow(label: String, valueDp: Int, onStep: (increase: Boolean) -> Unit) {
     val colors = LauncherTheme.colors
     val cells  = UiPrefs.MARGIN_MAX_DP / 8
-    val filled = (valueDp + 7) / 8
+    val filled = (kotlin.math.abs(valueDp) + 7) / 8
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
         Text(text = label, style = MaterialTheme.typography.labelMedium, color = colors.terminalPrompt, modifier = Modifier.weight(1f))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
@@ -225,12 +230,12 @@ private fun MarginStepperRow(label: String, valueDp: Int, onStep: (increase: Boo
             Text(
                 text  = "█".repeat(filled) + "·".repeat(cells - filled),
                 style = MaterialTheme.typography.labelSmall,
-                color = colors.primaryDim
+                color = if (valueDp < 0) colors.cursor else colors.primaryDim
             )
             Text(
-                text  = "${valueDp}dp".padStart(4),
+                text  = "${valueDp}dp".padStart(5),
                 style = MaterialTheme.typography.labelSmall,
-                color = colors.onBackground
+                color = if (valueDp < 0) colors.cursor else colors.onBackground
             )
             TerminalButton(label = "+", onClick = { onStep(true) })
         }

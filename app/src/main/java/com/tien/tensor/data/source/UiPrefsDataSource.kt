@@ -33,8 +33,8 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
                 fontScale        = p[fontScaleKey] ?: 1.0f,
                 use24hClock      = p[clock24Key] ?: true,
                 showClockSeconds = p[secondsKey] ?: true,
-                marginTopDp      = (p[marginTopKey] ?: 0).coerceIn(0, UiPrefs.MARGIN_MAX_DP),
-                marginBottomDp   = (p[marginBottomKey] ?: 0).coerceIn(0, UiPrefs.MARGIN_MAX_DP),
+                marginTopDp      = (p[marginTopKey] ?: 0).coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP),
+                marginBottomDp   = (p[marginBottomKey] ?: 0).coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP),
                 language         = p[languageKey] ?: UiPrefs.LANG_SYSTEM
             )
         }
@@ -45,8 +45,8 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
             p[fontScaleKey] = prefs.fontScale
             p[clock24Key]   = prefs.use24hClock
             p[secondsKey]   = prefs.showClockSeconds
-            p[marginTopKey]    = prefs.marginTopDp.coerceIn(0, UiPrefs.MARGIN_MAX_DP)
-            p[marginBottomKey] = prefs.marginBottomDp.coerceIn(0, UiPrefs.MARGIN_MAX_DP)
+            p[marginTopKey]    = prefs.marginTopDp.coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP)
+            p[marginBottomKey] = prefs.marginBottomDp.coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP)
             p[languageKey]     = prefs.language
         }
     }

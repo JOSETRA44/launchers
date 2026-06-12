@@ -34,7 +34,7 @@
     <string name="help_bar">Status bar size</string>
     <string name="help_font">Font scale (90–125)</string>
     <string name="help_clock">Clock format</string>
-    <string name="help_margin">Safety margin in dp (screen edges)</string>
+    <string name="help_margin">Edge margin in dp; negative hugs the edge</string>
     <string name="help_lang">Language: en / es / system</string>
     <string name="help_settings">Open settings</string>
     <string name="help_apps">Open app list</string>
@@ -52,7 +52,7 @@
     <string name="settings_font_size">FONT SIZE</string>
     <string name="settings_clock">CLOCK</string>
     <string name="settings_spacing">SPACING — PHYSICAL EDGES</string>
-    <string name="settings_spacing_hint">Push the UI away from cases, curved glass or screen protectors. Live preview.</string>
+    <string name="settings_spacing_hint">Positive: push the UI away from cases or curved glass. Negative: pull it past the system inset, flush to the hardware edge. Live preview.</string>
     <string name="settings_margin_top">TOP MARGIN</string>
     <string name="settings_margin_bottom">BOTTOM MARGIN</string>
     <string name="settings_language">LANGUAGE</string>

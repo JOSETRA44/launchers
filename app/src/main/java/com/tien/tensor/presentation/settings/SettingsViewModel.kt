@@ -53,11 +53,15 @@ class SettingsViewModel(
     fun onToggleClockSeconds()             = updatePrefs { it.copy(showClockSeconds = !it.showClockSeconds) }
     fun onLanguageSelected(tag: String)    = updatePrefs { it.copy(language = tag) }
 
-    /** Steps a physical-edge safety margin by ±[UiPrefs.MARGIN_STEP_DP]; applied live. */
+    /**
+     * Steps a physical-edge margin by ±[UiPrefs.MARGIN_STEP_DP]; applied live.
+     * The value is signed: below zero it compensates the system inset so the
+     * UI can hug the hardware edge (see UiPrefs / MainActivity).
+     */
     fun onMarginStepped(top: Boolean, increase: Boolean) = updatePrefs {
         val delta = if (increase) UiPrefs.MARGIN_STEP_DP else -UiPrefs.MARGIN_STEP_DP
-        if (top) it.copy(marginTopDp = (it.marginTopDp + delta).coerceIn(0, UiPrefs.MARGIN_MAX_DP))
-        else     it.copy(marginBottomDp = (it.marginBottomDp + delta).coerceIn(0, UiPrefs.MARGIN_MAX_DP))
+        if (top) it.copy(marginTopDp = (it.marginTopDp + delta).coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP))
+        else     it.copy(marginBottomDp = (it.marginBottomDp + delta).coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP))
     }
 
     private fun updatePrefs(transform: (UiPrefs) -> UiPrefs) {
