@@ -1,4 +1,4 @@
-import { Terminal, FolderGit2, MessageSquare, Mail } from 'lucide-react';
+import { Terminal, FolderGit2, MessageSquare } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 import { Link } from 'react-router-dom';
 
