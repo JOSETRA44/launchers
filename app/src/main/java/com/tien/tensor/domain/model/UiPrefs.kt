@@ -43,7 +43,15 @@ data class UiPrefs(
     val language: String = LANG_SYSTEM,
     val wallpaperAlpha: Float = 0.30f,
     val wallpaperSizePct: Int = 60,
-    val wallpaperAnchor: WallpaperAnchor = WallpaperAnchor.BOTTOM_RIGHT
+    val wallpaperAnchor: WallpaperAnchor = WallpaperAnchor.BOTTOM_RIGHT,
+    /** Show short date (e.g. MON 12 JUN) below the clock in the status bar. */
+    val showDate: Boolean = false,
+    /** When false the status bar background is transparent, letting the wallpaper bleed through. */
+    val statusBarOpaque: Boolean = true,
+    /** When false the prompt cursor is a static underscore instead of an animated block. */
+    val cursorBlink: Boolean = true,
+    /** Milliseconds between characters in typewriter animations. 0 = instant. */
+    val typingSpeedMs: Int = 55,
 ) {
     companion object {
         val FONT_SCALES = listOf(0.9f, 1.0f, 1.1f, 1.25f)
@@ -58,5 +66,14 @@ data class UiPrefs(
         val WALLPAPER_ALPHAS = listOf(0.15f, 0.30f, 0.50f, 1.0f)
         /** Wallpaper sticker width presets (% of screen width). */
         val WALLPAPER_SIZES = listOf(40, 60, 80, 100)
+        /** Typing animation speed presets in ms-per-character. */
+        val TYPING_SPEEDS = listOf(0, 20, 55, 150)
+        fun typingLabel(ms: Int): String = when (ms) {
+            0    -> "INSTANT"
+            20   -> "FAST"
+            55   -> "NORM"
+            150  -> "SLOW"
+            else -> "${ms}ms"
+        }
     }
 }

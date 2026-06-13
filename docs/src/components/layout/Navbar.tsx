@@ -17,9 +17,9 @@ const Navbar = () => {
   }, [menuOpen]);
 
   const navItems = [
-    { name: t('nav_home'),      path: '/',        icon: <Terminal size={15} />, isExternal: false },
-    { name: t('nav_reviews'),   path: '/resenas', icon: <Star size={15} />,    isExternal: false },
-    { name: t('nav_changelog'), path: 'https://github.com/JOSETRA44/launchers/releases/', icon: <Clock size={15} />, isExternal: true },
+    { name: t('nav_home'),      path: '/',          icon: <Terminal size={15} />, isExternal: false },
+    { name: t('nav_reviews'),   path: '/resenas',   icon: <Star size={15} />,    isExternal: false },
+    { name: t('nav_changelog'), path: '/versiones', icon: <Clock size={15} />,   isExternal: false },
   ];
 
   const isActive = (path: string, isExternal: boolean) =>

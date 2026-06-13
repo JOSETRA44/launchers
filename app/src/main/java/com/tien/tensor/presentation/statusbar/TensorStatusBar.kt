@@ -43,7 +43,9 @@ private const val LOW_BATTERY = 15
 @Composable
 fun TensorStatusBar(
     viewModel: StatusBarViewModel,
-    barSize: BarSize = BarSize.NORMAL
+    barSize: BarSize = BarSize.NORMAL,
+    showDate: Boolean = false,
+    opaque: Boolean = true,
 ) {
     val state  by viewModel.uiState.collectAsStateWithLifecycle()
     val colors = LauncherTheme.colors
@@ -69,7 +71,8 @@ fun TensorStatusBar(
         if (granted) viewModel.restartStatusCollection()
     }
 
-    Column(modifier = Modifier.fillMaxWidth().background(colors.background)) {
+    val bgModifier = if (opaque) Modifier.fillMaxWidth().background(colors.background) else Modifier.fillMaxWidth()
+    Column(modifier = bgModifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -77,9 +80,14 @@ fun TensorStatusBar(
             verticalAlignment     = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // ── Clock + power save ────────────────────────────────────────────
+            // ── Clock + optional date + power save ───────────────────────────
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = state.time, style = timeStyle, color = colors.primary)
+                Column {
+                    Text(text = state.time, style = timeStyle, color = colors.primary)
+                    if (showDate) {
+                        Text(text = state.date, style = MaterialTheme.typography.labelSmall, color = colors.onSurface)
+                    }
+                }
                 if (status.isPowerSave) {
                     Spacer(Modifier.width(TensorSpacing.sm))
                     Text(text = "ECO", style = MaterialTheme.typography.labelSmall, color = colors.cursor)

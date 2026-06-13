@@ -64,6 +64,10 @@ class SettingsViewModel(
     fun onClockFormatSelected(use24h: Boolean) = updatePrefs { it.copy(use24hClock = use24h) }
     fun onToggleClockSeconds()             = updatePrefs { it.copy(showClockSeconds = !it.showClockSeconds) }
     fun onLanguageSelected(tag: String)    = updatePrefs { it.copy(language = tag) }
+    fun onShowDateToggled()                = updatePrefs { it.copy(showDate = !it.showDate) }
+    fun onStatusBarOpaqueToggled()         = updatePrefs { it.copy(statusBarOpaque = !it.statusBarOpaque) }
+    fun onCursorBlinkSelected(blink: Boolean) = updatePrefs { it.copy(cursorBlink = blink) }
+    fun onTypingSpeedSelected(ms: Int)     = updatePrefs { it.copy(typingSpeedMs = ms) }
 
     /**
      * Steps a physical-edge margin by ±[UiPrefs.MARGIN_STEP_DP]; applied live.

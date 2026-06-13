@@ -49,9 +49,9 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <a href="https://github.com/JOSETRA44/launchers/releases/" target="_blank" rel="noopener noreferrer" className="text-primary-dim hover:text-primary transition-colors text-xs">
+              <Link to="/versiones" className="text-primary-dim hover:text-primary transition-colors text-xs">
                 [/] {t('nav_changelog')}
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>
@@ -70,13 +70,12 @@ const Footer = () => {
               </a>
             </li>
             <li>
-              <a
-                href="https://github.com/JOSETRA44/launchers/releases/"
-                target="_blank" rel="noopener noreferrer"
+              <Link
+                to="/versiones"
                 className="flex items-center gap-2 text-primary-dim hover:text-primary transition-colors text-xs"
               >
-                <Download size={13} aria-hidden="true" /> Releases &amp; APKs
-              </a>
+                <Download size={13} aria-hidden="true" /> Releases &amp; Changelog
+              </Link>
             </li>
             <li>
               <a

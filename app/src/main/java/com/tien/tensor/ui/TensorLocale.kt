@@ -23,19 +23,24 @@ import java.util.Locale
  */
 @Composable
 fun TensorLocale(languageTag: String, content: @Composable () -> Unit) {
-    if (languageTag == UiPrefs.LANG_SYSTEM) {
-        content()
-        return
-    }
-    val baseContext   = LocalContext.current
-    val baseConfig    = LocalConfiguration.current
-    val localized = remember(languageTag, baseContext, baseConfig) {
-        val config = Configuration(baseConfig).apply { setLocale(Locale.forLanguageTag(languageTag)) }
-        Pair(baseContext.createConfigurationContext(config), config)
+    val baseContext = LocalContext.current
+    val baseConfig  = LocalConfiguration.current
+    // Always use CompositionLocalProvider so the composition tree structure is
+    // stable regardless of the selected language. Switching conditionally between
+    // a raw content() call and a wrapped one changes composition positions, which
+    // causes every remembered state inside the tree to be disposed and recreated —
+    // including ActivityResultContracts launchers — leading to a crash.
+    val (localCtx, localCfg) = remember(languageTag, baseConfig) {
+        if (languageTag == UiPrefs.LANG_SYSTEM) {
+            baseContext to baseConfig
+        } else {
+            val cfg = Configuration(baseConfig).apply { setLocale(Locale.forLanguageTag(languageTag)) }
+            baseContext.createConfigurationContext(cfg) to cfg
+        }
     }
     CompositionLocalProvider(
-        LocalContext provides localized.first,
-        LocalConfiguration provides localized.second,
+        LocalContext provides localCtx,
+        LocalConfiguration provides localCfg,
         content = content
     )
 }

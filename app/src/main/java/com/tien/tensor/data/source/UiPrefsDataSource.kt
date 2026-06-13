@@ -28,6 +28,10 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
     private val wpAlphaKey      = floatPreferencesKey("ui_wp_alpha")
     private val wpSizeKey       = intPreferencesKey("ui_wp_size")
     private val wpAnchorKey     = stringPreferencesKey("ui_wp_anchor")
+    private val showDateKey         = booleanPreferencesKey("ui_show_date")
+    private val statusBarOpaqueKey  = booleanPreferencesKey("ui_bar_opaque")
+    private val cursorBlinkKey      = booleanPreferencesKey("ui_cursor_blink")
+    private val typingSpeedKey      = intPreferencesKey("ui_typing_speed")
 
     val prefs: Flow<UiPrefs> = dataStore.data
         .catch { emit(emptyPreferences()) }
@@ -43,7 +47,11 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
                 wallpaperAlpha   = (p[wpAlphaKey] ?: 0.30f).coerceIn(0.05f, 1f),
                 wallpaperSizePct = (p[wpSizeKey] ?: 60).coerceIn(10, 100),
                 wallpaperAnchor  = runCatching { WallpaperAnchor.valueOf(p[wpAnchorKey] ?: "") }
-                    .getOrDefault(WallpaperAnchor.BOTTOM_RIGHT)
+                    .getOrDefault(WallpaperAnchor.BOTTOM_RIGHT),
+                showDate        = p[showDateKey] ?: false,
+                statusBarOpaque = p[statusBarOpaqueKey] ?: true,
+                cursorBlink     = p[cursorBlinkKey] ?: true,
+                typingSpeedMs   = p[typingSpeedKey] ?: 55,
             )
         }
 
@@ -59,6 +67,10 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
             p[wpAlphaKey]      = prefs.wallpaperAlpha.coerceIn(0.05f, 1f)
             p[wpSizeKey]       = prefs.wallpaperSizePct.coerceIn(10, 100)
             p[wpAnchorKey]     = prefs.wallpaperAnchor.name
+            p[showDateKey]        = prefs.showDate
+            p[statusBarOpaqueKey] = prefs.statusBarOpaque
+            p[cursorBlinkKey]     = prefs.cursorBlink
+            p[typingSpeedKey]     = prefs.typingSpeedMs
         }
     }
 }

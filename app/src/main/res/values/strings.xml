@@ -5,6 +5,8 @@
     <string name="common_back">BACK</string>
     <string name="common_close">CLOSE</string>
     <string name="common_rescan">RESCAN</string>
+    <string name="common_on">ON</string>
+    <string name="common_off">OFF</string>
 
     <!-- Home -->
     <string name="home_recent">RECENT</string>
@@ -31,9 +33,12 @@
     <string name="help_group">Add app to folder</string>
     <string name="help_rmdir">Delete a folder</string>
     <string name="help_folder">Open folder overlay</string>
-    <string name="help_bar">Status bar size</string>
+    <string name="help_bar">Status bar size or background (bg on/off)</string>
     <string name="help_font">Font scale (90–125)</string>
     <string name="help_clock">Clock format</string>
+    <string name="help_date">Show/hide date below the clock</string>
+    <string name="help_cursor">Cursor animation: blink or static underscore</string>
+    <string name="help_type">Typing speed: instant / fast / norm / slow</string>
     <string name="help_margin">Edge margin in dp; negative hugs the edge</string>
     <string name="help_lang">Language: en / es / system</string>
     <string name="help_wall">Wallpaper sticker: opacity, size, position</string>
@@ -52,6 +57,15 @@
     <string name="settings_status_bar">STATUS BAR</string>
     <string name="settings_font_size">FONT SIZE</string>
     <string name="settings_clock">CLOCK</string>
+    <string name="settings_date_in_bar">DATE IN BAR</string>
+    <string name="settings_bar_bg">BAR BACKGROUND</string>
+    <string name="settings_bar_solid">SOLID</string>
+    <string name="settings_bar_clear">CLEAR</string>
+    <string name="settings_terminal">TERMINAL FEEL</string>
+    <string name="settings_cursor">CURSOR</string>
+    <string name="settings_cursor_blink">BLINK</string>
+    <string name="settings_cursor_static">STATIC</string>
+    <string name="settings_typing">TYPING SPEED</string>
     <string name="settings_spacing">SPACING — PHYSICAL EDGES</string>
     <string name="settings_spacing_hint">Positive: push the UI away from cases or curved glass. Negative: pull it past the system inset, flush to the hardware edge. Live preview.</string>
     <string name="settings_margin_top">TOP MARGIN</string>

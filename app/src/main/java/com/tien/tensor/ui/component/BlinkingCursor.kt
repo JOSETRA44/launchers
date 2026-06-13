@@ -9,10 +9,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import com.tien.tensor.ui.theme.LauncherTheme
+
+/** Composition-local that drives cursor animation across the tree. Defaults to true (blinking). */
+val LocalCursorBlink = compositionLocalOf { true }
 
 @Composable
 fun BlinkingCursor(
@@ -20,6 +24,13 @@ fun BlinkingCursor(
     style: TextStyle = LocalTextStyle.current
 ) {
     val colors = LauncherTheme.colors
+    val blink  = LocalCursorBlink.current
+
+    if (!blink) {
+        Text(text = "_", color = colors.cursor, modifier = modifier, style = style)
+        return
+    }
+
     val transition = rememberInfiniteTransition(label = "cursor_blink")
     val alpha by transition.animateFloat(
         initialValue = 1f,

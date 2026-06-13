@@ -18,6 +18,7 @@ import java.util.Locale
 
 data class StatusBarUiState(
     val time: String = "",
+    val date: String = "",
     val status: SystemStatus = SystemStatus()
 )
 
@@ -31,8 +32,9 @@ class StatusBarViewModel(
 ) : ViewModel() {
 
     private var timeFmt = SimpleDateFormat("HH:mm", Locale.US)
+    private val dateFmt = SimpleDateFormat("EEE dd MMM", Locale.US)
 
-    private val _state = MutableStateFlow(StatusBarUiState(time = now()))
+    private val _state = MutableStateFlow(StatusBarUiState(time = now(), date = nowDate()))
     val uiState: StateFlow<StatusBarUiState> = _state.asStateFlow()
 
     private var statusJob: Job? = null
@@ -47,7 +49,7 @@ class StatusBarViewModel(
         }
         viewModelScope.launch {
             while (true) {
-                _state.update { it.copy(time = now()) }
+                _state.update { it.copy(time = now(), date = nowDate()) }
                 // Wake exactly on the next minute boundary — no per-second polling
                 delay(60_000 - System.currentTimeMillis() % 60_000)
             }
@@ -66,5 +68,6 @@ class StatusBarViewModel(
         }
     }
 
-    private fun now(): String = timeFmt.format(Calendar.getInstance().time)
+    private fun now(): String     = timeFmt.format(Calendar.getInstance().time)
+    private fun nowDate(): String = dateFmt.format(Calendar.getInstance().time).uppercase()
 }

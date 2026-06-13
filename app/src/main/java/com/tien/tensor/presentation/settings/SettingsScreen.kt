@@ -25,9 +25,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -58,8 +64,20 @@ fun SettingsScreen(
     val colors  = LauncherTheme.colors
     val context = LocalContext.current
 
-    val notifEnabled = remember(Unit) {
-        NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
+    // Re-evaluated each time the screen resumes so granting access in system settings
+    // is reflected immediately when the user navigates back to this screen.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var notifEnabled by remember { mutableStateOf(false) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                notifEnabled = NotificationManagerCompat
+                    .getEnabledListenerPackages(context)
+                    .contains(context.packageName)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Column(
@@ -121,6 +139,36 @@ fun SettingsScreen(
                 active  = state.uiPrefs.showClockSeconds,
                 onClick = viewModel::onToggleClockSeconds
             )
+        }
+        Spacer(Modifier.height(TensorSpacing.xs))
+        OptionGroupRow(label = stringResource(R.string.settings_date_in_bar)) {
+            TerminalButton(label = stringResource(R.string.common_on),  active = state.uiPrefs.showDate,  onClick = { viewModel.onShowDateToggled() })
+            TerminalButton(label = stringResource(R.string.common_off), active = !state.uiPrefs.showDate, onClick = { viewModel.onShowDateToggled() })
+        }
+        Spacer(Modifier.height(TensorSpacing.xs))
+        OptionGroupRow(label = stringResource(R.string.settings_bar_bg)) {
+            TerminalButton(label = stringResource(R.string.settings_bar_solid), active = state.uiPrefs.statusBarOpaque,  onClick = { viewModel.onStatusBarOpaqueToggled() })
+            TerminalButton(label = stringResource(R.string.settings_bar_clear), active = !state.uiPrefs.statusBarOpaque, onClick = { viewModel.onStatusBarOpaqueToggled() })
+        }
+
+        TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
+
+        // Terminal feel section
+        TerminalSectionLabel(label = stringResource(R.string.settings_terminal))
+        Spacer(Modifier.height(TensorSpacing.sm))
+        OptionGroupRow(label = stringResource(R.string.settings_cursor)) {
+            TerminalButton(label = stringResource(R.string.settings_cursor_blink),  active = state.uiPrefs.cursorBlink,  onClick = { viewModel.onCursorBlinkSelected(true) })
+            TerminalButton(label = stringResource(R.string.settings_cursor_static), active = !state.uiPrefs.cursorBlink, onClick = { viewModel.onCursorBlinkSelected(false) })
+        }
+        Spacer(Modifier.height(TensorSpacing.xs))
+        OptionGroupRow(label = stringResource(R.string.settings_typing)) {
+            UiPrefs.TYPING_SPEEDS.forEach { ms ->
+                TerminalButton(
+                    label   = UiPrefs.typingLabel(ms),
+                    active  = state.uiPrefs.typingSpeedMs == ms,
+                    onClick = { viewModel.onTypingSpeedSelected(ms) }
+                )
+            }
         }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))

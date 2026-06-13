@@ -212,6 +212,18 @@ class LauncherViewModel(
             is CommandAction.SetLanguage -> {
                 viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(language = action.tag)); showOutput("> Language: ${action.tag.uppercase()}") }
             }
+            is CommandAction.ToggleDate -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(showDate = action.show)); showOutput("> Date in bar: ${if (action.show) "ON" else "OFF"}") }
+            }
+            is CommandAction.SetStatusBarOpaque -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(statusBarOpaque = action.opaque)); showOutput("> Bar background: ${if (action.opaque) "SOLID" else "CLEAR"}") }
+            }
+            is CommandAction.SetCursorBlink -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(cursorBlink = action.blink)); showOutput("> Cursor: ${if (action.blink) "BLINK" else "STATIC"}") }
+            }
+            is CommandAction.SetTypingSpeed -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(typingSpeedMs = action.ms)); showOutput("> Typing: ${UiPrefs.typingLabel(action.ms)}") }
+            }
             // Wallpaper sticker (image picking lives in Settings — needs the system picker)
             is CommandAction.SetWallpaperAlpha -> {
                 viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(wallpaperAlpha = action.alpha)); showOutput("> Wallpaper alpha: ${(action.alpha * 100).toInt()}%") }

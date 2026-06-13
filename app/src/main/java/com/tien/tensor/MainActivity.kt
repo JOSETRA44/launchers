@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -47,6 +48,8 @@ import com.tien.tensor.presentation.settings.SettingsViewModel
 import com.tien.tensor.presentation.statusbar.StatusBarViewModel
 import com.tien.tensor.presentation.statusbar.TensorStatusBar
 import com.tien.tensor.ui.TensorLocale
+import com.tien.tensor.ui.component.LocalCursorBlink
+import com.tien.tensor.ui.component.LocalTypingSpeed
 import com.tien.tensor.ui.component.WallpaperLayer
 import com.tien.tensor.ui.theme.LauncherTheme
 import com.tien.tensor.ui.theme.TensorTheme
@@ -137,6 +140,10 @@ class MainActivity : ComponentActivity() {
                 val effectiveTop    = (insetTopDp + settingsState.uiPrefs.marginTopDp.dp).coerceAtLeast(0.dp)
                 val effectiveBottom = (insetBottomDp + settingsState.uiPrefs.marginBottomDp.dp).coerceAtLeast(0.dp)
 
+                CompositionLocalProvider(
+                    LocalCursorBlink  provides settingsState.uiPrefs.cursorBlink,
+                    LocalTypingSpeed  provides settingsState.uiPrefs.typingSpeedMs,
+                ) {
                 Box(modifier = Modifier.fillMaxSize().background(colors.background)) {
                 // Wallpaper sticker layer (transparent PNGs float over the
                 // themed background); sits behind the status bar and every
@@ -162,7 +169,12 @@ class MainActivity : ComponentActivity() {
                     if (!hasBooted) {
                         BootScreen(onBootComplete = { hasBooted = true })
                     } else {
-                        TensorStatusBar(viewModel = statusBarViewModel, barSize = settingsState.uiPrefs.statusBarSize)
+                        TensorStatusBar(
+                            viewModel = statusBarViewModel,
+                            barSize   = settingsState.uiPrefs.statusBarSize,
+                            showDate  = settingsState.uiPrefs.showDate,
+                            opaque    = settingsState.uiPrefs.statusBarOpaque,
+                        )
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -191,7 +203,8 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-                }
+                } // Box
+                } // CompositionLocalProvider
             }
             }
         }

@@ -32,6 +32,9 @@ class ParseCommandUseCase {
             "margin"                  -> parseMargin(arg)
             "lang", "language"        -> parseLanguage(arg)
             "wall", "wallpaper"       -> parseWallpaper(arg)
+            "date"                    -> parseDate(arg)
+            "cursor"                  -> parseCursor(arg)
+            "type", "typing"          -> parseTyping(arg)
             // Folder commands
             "mkdir"                   -> arg.ifBlank { null }?.let { CommandAction.CreateFolder(it) }
             "rmdir"                   -> arg.ifBlank { null }?.let { CommandAction.DeleteFolder(it) }
@@ -59,11 +62,21 @@ class ParseCommandUseCase {
         else                       -> CommandAction.Unknown("theme $arg")
     }
 
-    private fun parseBarSize(arg: String): CommandAction = when (arg.trim().lowercase()) {
-        "s", "small", "compact" -> CommandAction.SetBarSize(BarSize.COMPACT)
-        "m", "medium", "normal" -> CommandAction.SetBarSize(BarSize.NORMAL)
-        "l", "large", "big"     -> CommandAction.SetBarSize(BarSize.LARGE)
-        else                     -> CommandAction.Unknown("bar $arg")
+    private fun parseBarSize(arg: String): CommandAction {
+        val a = arg.trim().lowercase()
+        if (a.startsWith("bg")) {
+            return when (a.removePrefix("bg").trim()) {
+                "on", "solid", "yes"  -> CommandAction.SetStatusBarOpaque(true)
+                "off", "clear", "no"  -> CommandAction.SetStatusBarOpaque(false)
+                else                   -> CommandAction.Unknown("bar $arg")
+            }
+        }
+        return when (a) {
+            "s", "small", "compact" -> CommandAction.SetBarSize(BarSize.COMPACT)
+            "m", "medium", "normal" -> CommandAction.SetBarSize(BarSize.NORMAL)
+            "l", "large", "big"     -> CommandAction.SetBarSize(BarSize.LARGE)
+            else                     -> CommandAction.Unknown("bar $arg")
+        }
     }
 
     private fun parseFontScale(arg: String): CommandAction {
@@ -139,6 +152,29 @@ class ParseCommandUseCase {
             else                     -> return CommandAction.Unknown("lang $arg")
         }
         return CommandAction.SetLanguage(tag)
+    }
+
+    private fun parseDate(arg: String): CommandAction = when (arg.trim().lowercase()) {
+        "on", "show", "yes"   -> CommandAction.ToggleDate(true)
+        "off", "hide", "no"   -> CommandAction.ToggleDate(false)
+        else                   -> CommandAction.Unknown("date $arg")
+    }
+
+    private fun parseCursor(arg: String): CommandAction = when (arg.trim().lowercase()) {
+        "blink", "animated"   -> CommandAction.SetCursorBlink(true)
+        "static", "off", "still" -> CommandAction.SetCursorBlink(false)
+        else                   -> CommandAction.Unknown("cursor $arg")
+    }
+
+    private fun parseTyping(arg: String): CommandAction {
+        val ms = when (arg.trim().lowercase()) {
+            "instant", "0"         -> 0
+            "fast", "20"           -> 20
+            "norm", "normal", "55" -> 55
+            "slow", "150"          -> 150
+            else                    -> return CommandAction.Unknown("type $arg")
+        }
+        return CommandAction.SetTypingSpeed(ms)
     }
 
     private fun parseGroup(arg: String): CommandAction? {

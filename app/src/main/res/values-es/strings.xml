@@ -5,6 +5,8 @@
     <string name="common_back">ATRÁS</string>
     <string name="common_close">CERRAR</string>
     <string name="common_rescan">REESCANEAR</string>
+    <string name="common_on">ON</string>
+    <string name="common_off">OFF</string>
 
     <!-- Inicio -->
     <string name="home_recent">RECIENTES</string>
@@ -31,9 +33,12 @@
     <string name="help_group">Añadir app a una carpeta</string>
     <string name="help_rmdir">Eliminar una carpeta</string>
     <string name="help_folder">Abrir carpeta</string>
-    <string name="help_bar">Tamaño de la barra de estado</string>
+    <string name="help_bar">Tamaño de la barra o fondo (bg on/off)</string>
     <string name="help_font">Escala de fuente (90–125)</string>
     <string name="help_clock">Formato del reloj</string>
+    <string name="help_date">Mostrar/ocultar fecha bajo el reloj</string>
+    <string name="help_cursor">Animación del cursor: blink o static</string>
+    <string name="help_type">Velocidad de escritura: instant / fast / norm / slow</string>
     <string name="help_margin">Margen del borde en dp; negativo lo pega al borde</string>
     <string name="help_lang">Idioma: en / es / system</string>
     <string name="help_wall">Sticker de fondo: opacidad, tamaño, posición</string>
@@ -52,6 +57,15 @@
     <string name="settings_status_bar">BARRA DE ESTADO</string>
     <string name="settings_font_size">TAMAÑO DE FUENTE</string>
     <string name="settings_clock">RELOJ</string>
+    <string name="settings_date_in_bar">FECHA EN BARRA</string>
+    <string name="settings_bar_bg">FONDO DE BARRA</string>
+    <string name="settings_bar_solid">SÓLIDO</string>
+    <string name="settings_bar_clear">CLARO</string>
+    <string name="settings_terminal">ESTILO TERMINAL</string>
+    <string name="settings_cursor">CURSOR</string>
+    <string name="settings_cursor_blink">PARPADEO</string>
+    <string name="settings_cursor_static">ESTÁTICO</string>
+    <string name="settings_typing">VELOCIDAD ESCRITURA</string>
     <string name="settings_spacing">ESPACIADO — BORDES FÍSICOS</string>
     <string name="settings_spacing_hint">Positivo: aleja la interfaz de fundas o cristales curvos. Negativo: la acerca más allá del margen del sistema, pegada al borde físico. Vista previa en vivo.</string>
     <string name="settings_margin_top">MARGEN SUPERIOR</string>
