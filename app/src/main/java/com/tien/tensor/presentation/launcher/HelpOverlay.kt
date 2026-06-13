@@ -48,6 +48,7 @@ private val COMMANDS = listOf(
     CmdEntry("/clock <12|24>",        R.string.help_clock),
     CmdEntry("/margin <t|b> <±dp>",   R.string.help_margin),
     CmdEntry("/lang <en|es|sys>",     R.string.help_lang),
+    CmdEntry("/wall <off|alpha|size|pos>", R.string.help_wall),
     CmdEntry("/settings",             R.string.help_settings),
     CmdEntry("/apps",                 R.string.help_apps),
     CmdEntry("/sec",                  R.string.help_sec),

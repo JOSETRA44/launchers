@@ -3,6 +3,9 @@ package com.tien.tensor.presentation.settings
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,6 +41,7 @@ import com.tien.tensor.domain.model.BarSize
 import com.tien.tensor.domain.model.ThemeConfig
 import com.tien.tensor.domain.model.ThemeId
 import com.tien.tensor.domain.model.UiPrefs
+import com.tien.tensor.domain.model.WallpaperAnchor
 import com.tien.tensor.ui.component.TerminalButton
 import com.tien.tensor.ui.component.TerminalDivider
 import com.tien.tensor.ui.component.TerminalPromptHeader
@@ -61,7 +65,6 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = TensorSpacing.screenH)
@@ -142,6 +145,77 @@ fun SettingsScreen(
             valueDp = state.uiPrefs.marginBottomDp,
             onStep  = { increase -> viewModel.onMarginStepped(top = false, increase = increase) }
         )
+
+        TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
+
+        // Wallpaper sticker — transparent PNGs float over the themed background;
+        // the layer renders behind this very screen, so every tweak previews live.
+        TerminalSectionLabel(label = stringResource(R.string.settings_wallpaper))
+        Spacer(Modifier.height(TensorSpacing.xs))
+        Text(
+            text  = stringResource(R.string.settings_wp_hint),
+            style = MaterialTheme.typography.labelSmall,
+            color = colors.onSurface
+        )
+        Spacer(Modifier.height(TensorSpacing.sm))
+        val pickImage = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) viewModel.onWallpaperPicked(uri.toString())
+        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
+            TerminalButton(
+                label    = stringResource(R.string.settings_wp_pick),
+                onClick  = {
+                    pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                },
+                modifier = Modifier.weight(1f)
+            )
+            if (state.wallpaperPath != null) {
+                TerminalButton(
+                    label    = stringResource(R.string.settings_wp_remove),
+                    onClick  = viewModel::onWallpaperCleared,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        if (state.wallpaperPath != null) {
+            Spacer(Modifier.height(TensorSpacing.xs))
+            OptionGroupRow(label = stringResource(R.string.settings_wp_opacity)) {
+                UiPrefs.WALLPAPER_ALPHAS.forEach { alpha ->
+                    TerminalButton(
+                        label   = "${(alpha * 100).toInt()}",
+                        active  = state.uiPrefs.wallpaperAlpha == alpha,
+                        onClick = { viewModel.onWallpaperAlphaSelected(alpha) }
+                    )
+                }
+            }
+            Spacer(Modifier.height(TensorSpacing.xs))
+            OptionGroupRow(label = stringResource(R.string.settings_wp_size)) {
+                UiPrefs.WALLPAPER_SIZES.forEach { size ->
+                    TerminalButton(
+                        label   = "$size",
+                        active  = state.uiPrefs.wallpaperSizePct == size,
+                        onClick = { viewModel.onWallpaperSizeSelected(size) }
+                    )
+                }
+            }
+            Spacer(Modifier.height(TensorSpacing.xs))
+            Text(
+                text  = stringResource(R.string.settings_wp_position),
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.terminalPrompt
+            )
+            Spacer(Modifier.height(TensorSpacing.xxs))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(TensorSpacing.xs)) {
+                WallpaperAnchor.entries.forEach { anchor ->
+                    TerminalButton(
+                        label    = anchor.displayName,
+                        active   = state.uiPrefs.wallpaperAnchor == anchor,
+                        onClick  = { viewModel.onWallpaperAnchorSelected(anchor) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
 
         TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 

@@ -19,6 +19,7 @@ import com.tien.tensor.data.repository.SystemStatusRepositoryImpl
 import com.tien.tensor.data.repository.ThemeRepositoryImpl
 import com.tien.tensor.data.repository.UiPrefsRepositoryImpl
 import com.tien.tensor.data.repository.UsageStatsRepositoryImpl
+import com.tien.tensor.data.repository.WallpaperRepositoryImpl
 import com.tien.tensor.data.source.AppDataSource
 import com.tien.tensor.data.source.AppUsageDataSource
 import com.tien.tensor.data.source.FolderDataSource
@@ -28,6 +29,7 @@ import com.tien.tensor.data.source.SecurityDataSource
 import com.tien.tensor.data.source.StepCounterDataSource
 import com.tien.tensor.data.source.SystemStatusDataSource
 import com.tien.tensor.data.source.UiPrefsDataSource
+import com.tien.tensor.data.source.WallpaperDataSource
 import com.tien.tensor.data.arsenal.AccessControlModule
 import com.tien.tensor.data.arsenal.AppRiskModule
 import com.tien.tensor.data.arsenal.ArsenalRegistryImpl
@@ -50,9 +52,13 @@ import com.tien.tensor.domain.port.SystemStatusRepository
 import com.tien.tensor.domain.port.ThemeRepository
 import com.tien.tensor.domain.port.UiPrefsRepository
 import com.tien.tensor.domain.port.UsageStatsRepository
+import com.tien.tensor.domain.port.WallpaperRepository
 import com.tien.tensor.domain.port.WebSearchLauncher
 import com.tien.tensor.domain.usecase.AddToFolderUseCase
 import com.tien.tensor.domain.usecase.ClearHistoryUseCase
+import com.tien.tensor.domain.usecase.ClearWallpaperUseCase
+import com.tien.tensor.domain.usecase.ObserveWallpaperUseCase
+import com.tien.tensor.domain.usecase.SetWallpaperUseCase
 import com.tien.tensor.domain.usecase.CreateFolderUseCase
 import com.tien.tensor.domain.usecase.DeleteFolderUseCase
 import com.tien.tensor.domain.usecase.GeneratePasswordUseCase
@@ -117,6 +123,7 @@ object AppModule {
     private val folderDataSource      by lazy { FolderDataSource(folderDataStore) }
     private val systemStatusDataSource by lazy { SystemStatusDataSource(appContext) }
     private val uiPrefsDataSource      by lazy { UiPrefsDataSource(themeDataStore) }
+    private val wallpaperDataSource    by lazy { WallpaperDataSource(appContext) }
     private val securityDataSource    by lazy { SecurityDataSource(appContext) }
     private val usageStatsDataSource  by lazy { UsageStatsDataSource(appContext) }
     private val stepCounterDataSource by lazy { StepCounterDataSource(appContext, stepsDataStore) }
@@ -126,6 +133,7 @@ object AppModule {
     private val appRepository: AppRepository           by lazy { AppRepositoryImpl(appDataSource, appContext) }
     private val themeRepository: ThemeRepository       by lazy { ThemeRepositoryImpl(preferencesDataSource) }
     private val uiPrefsRepository: UiPrefsRepository   by lazy { UiPrefsRepositoryImpl(uiPrefsDataSource) }
+    private val wallpaperRepository: WallpaperRepository by lazy { WallpaperRepositoryImpl(wallpaperDataSource) }
     private val appUsageRepository: AppUsageRepository by lazy { AppUsageRepositoryImpl(appUsageDataSource) }
     private val pinnedAppsRepository: PinnedAppsRepository by lazy { PinnedAppsRepositoryImpl(pinnedAppsDataSource) }
     private val folderRepository: FolderRepository     by lazy { FolderRepositoryImpl(folderDataSource) }
@@ -164,6 +172,9 @@ object AppModule {
     val setThemeUseCase                   by lazy { SetThemeUseCase(themeRepository) }
     private val getUiPrefsUseCase         by lazy { GetUiPrefsUseCase(uiPrefsRepository) }
     private val updateUiPrefsUseCase      by lazy { UpdateUiPrefsUseCase(uiPrefsRepository) }
+    private val observeWallpaperUseCase   by lazy { ObserveWallpaperUseCase(wallpaperRepository) }
+    private val setWallpaperUseCase       by lazy { SetWallpaperUseCase(wallpaperRepository) }
+    private val clearWallpaperUseCase     by lazy { ClearWallpaperUseCase(wallpaperRepository) }
     private val trackAppLaunchUseCase     by lazy { TrackAppLaunchUseCase(appUsageRepository) }
     private val getSmartAppsUseCase       by lazy { GetSmartAppsUseCase(appUsageRepository, appRepository) }
     private val clearHistoryUseCase       by lazy { ClearHistoryUseCase(appUsageRepository) }
@@ -211,7 +222,8 @@ object AppModule {
             getSystemStatusUseCase       = getSystemStatusUseCase,
             getNotificationCountsUseCase = getNotificationCountsUseCase,
             getUiPrefsUseCase            = getUiPrefsUseCase,
-            updateUiPrefsUseCase         = updateUiPrefsUseCase
+            updateUiPrefsUseCase         = updateUiPrefsUseCase,
+            clearWallpaperUseCase        = clearWallpaperUseCase
         )
     }
 
@@ -220,7 +232,10 @@ object AppModule {
     }
 
     fun settingsViewModelFactory() = factory {
-        SettingsViewModel(getThemeUseCase, getUiPrefsUseCase, setThemeUseCase, updateUiPrefsUseCase, clearHistoryUseCase)
+        SettingsViewModel(
+            getThemeUseCase, getUiPrefsUseCase, setThemeUseCase, updateUiPrefsUseCase,
+            clearHistoryUseCase, observeWallpaperUseCase, setWallpaperUseCase, clearWallpaperUseCase
+        )
     }
 
     fun securityViewModelFactory() = factory {

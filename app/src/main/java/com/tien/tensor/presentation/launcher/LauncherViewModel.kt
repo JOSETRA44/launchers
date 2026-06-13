@@ -9,6 +9,7 @@ import com.tien.tensor.domain.port.AppInfoLauncher
 import com.tien.tensor.domain.port.WebSearchLauncher
 import com.tien.tensor.domain.usecase.AddToFolderUseCase
 import com.tien.tensor.domain.usecase.ClearHistoryUseCase
+import com.tien.tensor.domain.usecase.ClearWallpaperUseCase
 import com.tien.tensor.domain.usecase.CreateFolderUseCase
 import com.tien.tensor.domain.usecase.DeleteFolderUseCase
 import com.tien.tensor.domain.usecase.GetFoldersUseCase
@@ -64,7 +65,8 @@ class LauncherViewModel(
     private val getSystemStatusUseCase: GetSystemStatusUseCase,
     private val getNotificationCountsUseCase: GetNotificationCountsUseCase,
     private val getUiPrefsUseCase: GetUiPrefsUseCase,
-    private val updateUiPrefsUseCase: UpdateUiPrefsUseCase
+    private val updateUiPrefsUseCase: UpdateUiPrefsUseCase,
+    private val clearWallpaperUseCase: ClearWallpaperUseCase
 ) : ViewModel() {
 
     private var uiPrefs = UiPrefs()
@@ -209,6 +211,19 @@ class LauncherViewModel(
             }
             is CommandAction.SetLanguage -> {
                 viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(language = action.tag)); showOutput("> Language: ${action.tag.uppercase()}") }
+            }
+            // Wallpaper sticker (image picking lives in Settings — needs the system picker)
+            is CommandAction.SetWallpaperAlpha -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(wallpaperAlpha = action.alpha)); showOutput("> Wallpaper alpha: ${(action.alpha * 100).toInt()}%") }
+            }
+            is CommandAction.SetWallpaperSize -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(wallpaperSizePct = action.sizePct)); showOutput("> Wallpaper size: ${action.sizePct}%") }
+            }
+            is CommandAction.SetWallpaperAnchor -> {
+                viewModelScope.launch { updateUiPrefsUseCase(uiPrefs.copy(wallpaperAnchor = action.anchor)); showOutput("> Wallpaper position: ${action.anchor.displayName}") }
+            }
+            CommandAction.ClearWallpaper -> {
+                viewModelScope.launch { clearWallpaperUseCase(); showOutput("> Wallpaper removed.") }
             }
             // Folder commands
             is CommandAction.CreateFolder -> {

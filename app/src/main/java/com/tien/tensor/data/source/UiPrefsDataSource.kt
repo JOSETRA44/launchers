@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.tien.tensor.domain.model.BarSize
 import com.tien.tensor.domain.model.UiPrefs
+import com.tien.tensor.domain.model.WallpaperAnchor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -24,6 +25,9 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
     private val marginTopKey    = intPreferencesKey("ui_margin_top")
     private val marginBottomKey = intPreferencesKey("ui_margin_bottom")
     private val languageKey     = stringPreferencesKey("ui_language")
+    private val wpAlphaKey      = floatPreferencesKey("ui_wp_alpha")
+    private val wpSizeKey       = intPreferencesKey("ui_wp_size")
+    private val wpAnchorKey     = stringPreferencesKey("ui_wp_anchor")
 
     val prefs: Flow<UiPrefs> = dataStore.data
         .catch { emit(emptyPreferences()) }
@@ -35,7 +39,11 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
                 showClockSeconds = p[secondsKey] ?: true,
                 marginTopDp      = (p[marginTopKey] ?: 0).coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP),
                 marginBottomDp   = (p[marginBottomKey] ?: 0).coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP),
-                language         = p[languageKey] ?: UiPrefs.LANG_SYSTEM
+                language         = p[languageKey] ?: UiPrefs.LANG_SYSTEM,
+                wallpaperAlpha   = (p[wpAlphaKey] ?: 0.30f).coerceIn(0.05f, 1f),
+                wallpaperSizePct = (p[wpSizeKey] ?: 60).coerceIn(10, 100),
+                wallpaperAnchor  = runCatching { WallpaperAnchor.valueOf(p[wpAnchorKey] ?: "") }
+                    .getOrDefault(WallpaperAnchor.BOTTOM_RIGHT)
             )
         }
 
@@ -48,6 +56,9 @@ class UiPrefsDataSource(private val dataStore: DataStore<Preferences>) {
             p[marginTopKey]    = prefs.marginTopDp.coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP)
             p[marginBottomKey] = prefs.marginBottomDp.coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP)
             p[languageKey]     = prefs.language
+            p[wpAlphaKey]      = prefs.wallpaperAlpha.coerceIn(0.05f, 1f)
+            p[wpSizeKey]       = prefs.wallpaperSizePct.coerceIn(10, 100)
+            p[wpAnchorKey]     = prefs.wallpaperAnchor.name
         }
     }
 }

@@ -47,6 +47,7 @@ import com.tien.tensor.presentation.settings.SettingsViewModel
 import com.tien.tensor.presentation.statusbar.StatusBarViewModel
 import com.tien.tensor.presentation.statusbar.TensorStatusBar
 import com.tien.tensor.ui.TensorLocale
+import com.tien.tensor.ui.component.WallpaperLayer
 import com.tien.tensor.ui.theme.LauncherTheme
 import com.tien.tensor.ui.theme.TensorTheme
 import androidx.compose.foundation.layout.padding
@@ -136,10 +137,21 @@ class MainActivity : ComponentActivity() {
                 val effectiveTop    = (insetTopDp + settingsState.uiPrefs.marginTopDp.dp).coerceAtLeast(0.dp)
                 val effectiveBottom = (insetBottomDp + settingsState.uiPrefs.marginBottomDp.dp).coerceAtLeast(0.dp)
 
+                Box(modifier = Modifier.fillMaxSize().background(colors.background)) {
+                // Wallpaper sticker layer (transparent PNGs float over the
+                // themed background); sits behind the status bar and every
+                // destination. Styled via Settings → WALLPAPER or /wall.
+                settingsState.wallpaperPath?.let { wp ->
+                    WallpaperLayer(
+                        path    = wp,
+                        alpha   = settingsState.uiPrefs.wallpaperAlpha,
+                        sizePct = settingsState.uiPrefs.wallpaperSizePct,
+                        anchor  = settingsState.uiPrefs.wallpaperAnchor
+                    )
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(colors.background)
                         // Horizontal cutouts (landscape punch-holes) are never
                         // user-overridable — content there is unreadable.
                         .windowInsetsPadding(topInsets.only(WindowInsetsSides.Horizontal))
@@ -178,6 +190,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
+                }
                 }
             }
             }

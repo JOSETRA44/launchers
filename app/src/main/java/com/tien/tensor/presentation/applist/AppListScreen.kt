@@ -65,7 +65,6 @@ fun AppListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = TensorSpacing.screenH)

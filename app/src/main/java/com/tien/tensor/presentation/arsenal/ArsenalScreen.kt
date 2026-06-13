@@ -66,7 +66,6 @@ fun ArsenalScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
             .navigationBarsPadding()
             .padding(horizontal = TensorSpacing.screenH)
     ) {

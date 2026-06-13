@@ -36,6 +36,7 @@
     <string name="help_clock">Formato del reloj</string>
     <string name="help_margin">Margen del borde en dp; negativo lo pega al borde</string>
     <string name="help_lang">Idioma: en / es / system</string>
+    <string name="help_wall">Sticker de fondo: opacidad, tamaño, posición</string>
     <string name="help_settings">Abrir ajustes</string>
     <string name="help_apps">Abrir lista de apps</string>
     <string name="help_sec">Herramientas de seguridad y auditoría</string>
@@ -55,6 +56,13 @@
     <string name="settings_spacing_hint">Positivo: aleja la interfaz de fundas o cristales curvos. Negativo: la acerca más allá del margen del sistema, pegada al borde físico. Vista previa en vivo.</string>
     <string name="settings_margin_top">MARGEN SUPERIOR</string>
     <string name="settings_margin_bottom">MARGEN INFERIOR</string>
+    <string name="settings_wallpaper">FONDO — STICKER</string>
+    <string name="settings_wp_hint">Elige cualquier imagen — los PNG transparentes flotan sobre el terminal como un sticker. Vista previa en vivo.</string>
+    <string name="settings_wp_pick">ELEGIR IMAGEN</string>
+    <string name="settings_wp_remove">QUITAR</string>
+    <string name="settings_wp_opacity">OPACIDAD %</string>
+    <string name="settings_wp_size">TAMAÑO %</string>
+    <string name="settings_wp_position">POSICIÓN</string>
     <string name="settings_language">IDIOMA</string>
     <string name="settings_lang_system">SISTEMA</string>
     <string name="settings_usage_data">DATOS DE USO</string>

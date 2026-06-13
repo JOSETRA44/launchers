@@ -2,7 +2,6 @@ package com.tien.tensor.presentation.boot
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -69,7 +68,6 @@ fun BootScreen(onBootComplete: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
             .graphicsLayer { this.alpha = alpha }
     ) {
         // Subtle digital rain behind the boot log

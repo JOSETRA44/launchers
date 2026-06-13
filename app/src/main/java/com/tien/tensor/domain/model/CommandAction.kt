@@ -13,6 +13,11 @@ sealed class CommandAction {
     data class SetClockFormat(val use24h: Boolean) : CommandAction()
     data class SetMargin(val top: Boolean, val dp: Int) : CommandAction()
     data class SetLanguage(val tag: String) : CommandAction()
+    // Wallpaper sticker (image picking happens in Settings — needs the system picker)
+    data class SetWallpaperAlpha(val alpha: Float) : CommandAction()
+    data class SetWallpaperSize(val sizePct: Int) : CommandAction()
+    data class SetWallpaperAnchor(val anchor: WallpaperAnchor) : CommandAction()
+    data object ClearWallpaper : CommandAction()
     // Folders
     data class CreateFolder(val name: String) : CommandAction()
     data class AddToFolder(val folderName: String, val appQuery: String) : CommandAction()

@@ -111,7 +111,6 @@ fun LauncherScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
             .pointerInput(Unit) {
                 var cumulativeDy = 0f
                 detectVerticalDragGestures(

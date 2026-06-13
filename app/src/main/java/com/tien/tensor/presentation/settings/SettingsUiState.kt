@@ -8,5 +8,7 @@ data class SettingsUiState(
     val selectedThemeId: ThemeId = ThemeId.HACKER_DARK,
     val availableThemes: List<ThemeConfig> = ThemeId.entries.map { ThemeConfig(it) },
     val uiPrefs: UiPrefs = UiPrefs(),
-    val historyCleared: Boolean = false
+    val historyCleared: Boolean = false,
+    /** Absolute path of the imported wallpaper image, or null when unset. */
+    val wallpaperPath: String? = null
 )

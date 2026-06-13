@@ -4,6 +4,7 @@ import com.tien.tensor.domain.model.BarSize
 import com.tien.tensor.domain.model.CommandAction
 import com.tien.tensor.domain.model.ThemeId
 import com.tien.tensor.domain.model.UiPrefs
+import com.tien.tensor.domain.model.WallpaperAnchor
 
 class ParseCommandUseCase {
 
@@ -30,6 +31,7 @@ class ParseCommandUseCase {
             "clock"                   -> parseClock(arg)
             "margin"                  -> parseMargin(arg)
             "lang", "language"        -> parseLanguage(arg)
+            "wall", "wallpaper"       -> parseWallpaper(arg)
             // Folder commands
             "mkdir"                   -> arg.ifBlank { null }?.let { CommandAction.CreateFolder(it) }
             "rmdir"                   -> arg.ifBlank { null }?.let { CommandAction.DeleteFolder(it) }
@@ -92,6 +94,42 @@ class ParseCommandUseCase {
         }
         val dp = parts[1].toIntOrNull() ?: return CommandAction.Unknown("margin $arg")
         return CommandAction.SetMargin(top, dp.coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP))
+    }
+
+    /**
+     * `/wall off | alpha <15|30|50|100> | size <40|60|80|100> | pos <tl|tr|c|bl|br|fill>`
+     * Styles the wallpaper sticker layer. Picking the image itself needs the
+     * system photo picker, so it lives in Settings, not here.
+     */
+    private fun parseWallpaper(arg: String): CommandAction {
+        val parts = arg.trim().split("\\s+".toRegex())
+        return when (parts[0].lowercase()) {
+            "off", "clear", "none" -> CommandAction.ClearWallpaper
+            "alpha", "opacity" -> {
+                val pct = parts.getOrNull(1)?.removeSuffix("%")?.toIntOrNull()
+                    ?: return CommandAction.Unknown("wall $arg")
+                val alpha = UiPrefs.WALLPAPER_ALPHAS.minByOrNull { kotlin.math.abs(it * 100 - pct) }
+                    ?: return CommandAction.Unknown("wall $arg")
+                CommandAction.SetWallpaperAlpha(alpha)
+            }
+            "size" -> {
+                val pct = parts.getOrNull(1)?.removeSuffix("%")?.toIntOrNull()
+                    ?: return CommandAction.Unknown("wall $arg")
+                val size = UiPrefs.WALLPAPER_SIZES.minByOrNull { kotlin.math.abs(it - pct) }
+                    ?: return CommandAction.Unknown("wall $arg")
+                CommandAction.SetWallpaperSize(size)
+            }
+            "pos", "position" -> when (parts.getOrNull(1)?.lowercase()) {
+                "tl", "topleft"     -> CommandAction.SetWallpaperAnchor(WallpaperAnchor.TOP_LEFT)
+                "tr", "topright"    -> CommandAction.SetWallpaperAnchor(WallpaperAnchor.TOP_RIGHT)
+                "c", "center"       -> CommandAction.SetWallpaperAnchor(WallpaperAnchor.CENTER)
+                "bl", "bottomleft"  -> CommandAction.SetWallpaperAnchor(WallpaperAnchor.BOTTOM_LEFT)
+                "br", "bottomright" -> CommandAction.SetWallpaperAnchor(WallpaperAnchor.BOTTOM_RIGHT)
+                "fill", "full"      -> CommandAction.SetWallpaperAnchor(WallpaperAnchor.FILL)
+                else                 -> CommandAction.Unknown("wall $arg")
+            }
+            else -> CommandAction.Unknown("wall $arg")
+        }
     }
 
     private fun parseLanguage(arg: String): CommandAction {

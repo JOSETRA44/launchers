@@ -5,10 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.tien.tensor.domain.model.BarSize
 import com.tien.tensor.domain.model.ThemeId
 import com.tien.tensor.domain.model.UiPrefs
+import com.tien.tensor.domain.model.WallpaperAnchor
 import com.tien.tensor.domain.usecase.ClearHistoryUseCase
+import com.tien.tensor.domain.usecase.ClearWallpaperUseCase
 import com.tien.tensor.domain.usecase.GetThemeUseCase
 import com.tien.tensor.domain.usecase.GetUiPrefsUseCase
+import com.tien.tensor.domain.usecase.ObserveWallpaperUseCase
 import com.tien.tensor.domain.usecase.SetThemeUseCase
+import com.tien.tensor.domain.usecase.SetWallpaperUseCase
 import com.tien.tensor.domain.usecase.UpdateUiPrefsUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +26,10 @@ class SettingsViewModel(
     getUiPrefsUseCase: GetUiPrefsUseCase,
     private val setThemeUseCase: SetThemeUseCase,
     private val updateUiPrefsUseCase: UpdateUiPrefsUseCase,
-    private val clearHistoryUseCase: ClearHistoryUseCase
+    private val clearHistoryUseCase: ClearHistoryUseCase,
+    observeWallpaperUseCase: ObserveWallpaperUseCase,
+    private val setWallpaperUseCase: SetWallpaperUseCase,
+    private val clearWallpaperUseCase: ClearWallpaperUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsUiState())
@@ -37,6 +44,11 @@ class SettingsViewModel(
         viewModelScope.launch {
             getUiPrefsUseCase().collect { prefs ->
                 _state.update { it.copy(uiPrefs = prefs) }
+            }
+        }
+        viewModelScope.launch {
+            observeWallpaperUseCase().collect { path ->
+                _state.update { it.copy(wallpaperPath = path) }
             }
         }
     }
@@ -63,6 +75,15 @@ class SettingsViewModel(
         if (top) it.copy(marginTopDp = (it.marginTopDp + delta).coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP))
         else     it.copy(marginBottomDp = (it.marginBottomDp + delta).coerceIn(UiPrefs.MARGIN_MIN_DP, UiPrefs.MARGIN_MAX_DP))
     }
+
+    // ── Wallpaper sticker ─────────────────────────────────────────────────────
+
+    /** [uri] is the platform content-Uri as text; the data layer imports a copy. */
+    fun onWallpaperPicked(uri: String)  { viewModelScope.launch { setWallpaperUseCase(uri) } }
+    fun onWallpaperCleared()            { viewModelScope.launch { clearWallpaperUseCase() } }
+    fun onWallpaperAlphaSelected(alpha: Float)        = updatePrefs { it.copy(wallpaperAlpha = alpha) }
+    fun onWallpaperSizeSelected(sizePct: Int)         = updatePrefs { it.copy(wallpaperSizePct = sizePct) }
+    fun onWallpaperAnchorSelected(anchor: WallpaperAnchor) = updatePrefs { it.copy(wallpaperAnchor = anchor) }
 
     private fun updatePrefs(transform: (UiPrefs) -> UiPrefs) {
         viewModelScope.launch { updateUiPrefsUseCase(transform(_state.value.uiPrefs)) }

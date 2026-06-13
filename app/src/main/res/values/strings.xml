@@ -36,6 +36,7 @@
     <string name="help_clock">Clock format</string>
     <string name="help_margin">Edge margin in dp; negative hugs the edge</string>
     <string name="help_lang">Language: en / es / system</string>
+    <string name="help_wall">Wallpaper sticker: opacity, size, position</string>
     <string name="help_settings">Open settings</string>
     <string name="help_apps">Open app list</string>
     <string name="help_sec">Security toolkit &amp; device audit</string>
@@ -55,6 +56,13 @@
     <string name="settings_spacing_hint">Positive: push the UI away from cases or curved glass. Negative: pull it past the system inset, flush to the hardware edge. Live preview.</string>
     <string name="settings_margin_top">TOP MARGIN</string>
     <string name="settings_margin_bottom">BOTTOM MARGIN</string>
+    <string name="settings_wallpaper">WALLPAPER — STICKER</string>
+    <string name="settings_wp_hint">Pick any image — transparent PNGs float over the terminal like a sticker. Live preview.</string>
+    <string name="settings_wp_pick">PICK IMAGE</string>
+    <string name="settings_wp_remove">REMOVE</string>
+    <string name="settings_wp_opacity">OPACITY %</string>
+    <string name="settings_wp_size">SIZE %</string>
+    <string name="settings_wp_position">POSITION</string>
     <string name="settings_language">LANGUAGE</string>
     <string name="settings_lang_system">SYSTEM</string>
     <string name="settings_usage_data">USAGE DATA</string>
