@@ -1,5 +1,7 @@
 package com.tien.tensor
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -66,6 +68,19 @@ class MainActivity : ComponentActivity() {
     // Activity-scoped: the dynamic status bar is shared by every destination
     private val statusBarViewModel: StatusBarViewModel by viewModels {
         AppModule.statusBarViewModelFactory()
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        val prefs = newBase.getSharedPreferences("tensor_locale", Context.MODE_PRIVATE)
+        val savedLocale = prefs.getString("locale", null)
+        val ctx = if (savedLocale != null) {
+            val cfg = Configuration(newBase.resources.configuration)
+            cfg.setLocale(java.util.Locale.forLanguageTag(savedLocale))
+            newBase.createConfigurationContext(cfg)
+        } else {
+            newBase
+        }
+        super.attachBaseContext(ctx)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

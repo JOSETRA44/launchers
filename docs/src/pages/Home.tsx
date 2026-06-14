@@ -1,4 +1,4 @@
-import { Terminal, Shield, FolderGit2, HelpCircle, Database, Cpu, Lock, Download, Zap, Code2, ChevronDown } from 'lucide-react';
+import { Terminal, Shield, FolderGit2, HelpCircle, Database, Cpu, Lock, Download, Zap, Code2, ChevronDown, Keyboard, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TerminalSimulator } from '../components/terminal/TerminalSimulator';
 import { useLanguage } from '../components/LanguageContext';
@@ -133,19 +133,21 @@ const Home = () => {
   const { t } = useLanguage();
 
   const stats = [
-    { label: t('stat_downloads'), value: 500, suffix: '+', raw: '',      icon: <Download size={14} /> },
+    { label: t('stat_downloads'), value: 500, suffix: '+', raw: '',       icon: <Download size={14} /> },
     { label: t('stat_version'),   value: 0,   suffix: '',  raw: 'v1.0.4', icon: <Terminal size={14} /> },
-    { label: t('stat_themes'),    value: 3,   suffix: '',  raw: '',      icon: <Zap size={14} /> },
-    { label: t('stat_perms'),     value: 0,   suffix: '',  raw: '',      icon: <Shield size={14} /> },
+    { label: t('stat_themes'),    value: 3,   suffix: '',  raw: '',       icon: <Zap size={14} /> },
+    { label: t('stat_arsenal'),   value: 9,   suffix: '',  raw: '',       icon: <Shield size={14} /> },
   ];
 
   const featureCards: Omit<CardProps, 'index'>[] = [
-    { icon: <Terminal size={18} />,   title: t('feat_cli_title'),    desc: t('feat_cli_desc'),    borderCls: 'border-primary', textCls: 'text-primary', gradCls: 'from-primary/8' },
-    { icon: <Shield size={18} />,     title: t('feat_sec_title'),    desc: t('feat_sec_desc'),    borderCls: 'border-cursor',  textCls: 'text-cursor',  gradCls: 'from-cursor/8'  },
-    { icon: <Database size={18} />,   title: t('feat_cache_title'),  desc: t('feat_cache_desc'),  borderCls: 'border-prompt',  textCls: 'text-prompt',  gradCls: 'from-prompt/8'  },
-    { icon: <Code2 size={18} />,      title: t('feat_matrix_title'), desc: t('feat_matrix_desc'), borderCls: 'border-primary', textCls: 'text-primary', gradCls: 'from-primary/5' },
-    { icon: <Zap size={18} />,        title: t('feat_themes_title'), desc: t('feat_themes_desc'), borderCls: 'border-cursor',  textCls: 'text-cursor',  gradCls: 'from-cursor/5'  },
-    { icon: <FolderGit2 size={18} />, title: t('feat_oss_title'),    desc: t('feat_oss_desc'),    borderCls: 'border-prompt',  textCls: 'text-prompt',  gradCls: 'from-prompt/5'  },
+    { icon: <Terminal size={18} />,   title: t('feat_cli_title'),     desc: t('feat_cli_desc'),     borderCls: 'border-primary', textCls: 'text-primary', gradCls: 'from-primary/8' },
+    { icon: <Shield size={18} />,     title: t('feat_sec_title'),     desc: t('feat_sec_desc'),     borderCls: 'border-cursor',  textCls: 'text-cursor',  gradCls: 'from-cursor/8'  },
+    { icon: <Database size={18} />,   title: t('feat_cache_title'),   desc: t('feat_cache_desc'),   borderCls: 'border-prompt',  textCls: 'text-prompt',  gradCls: 'from-prompt/8'  },
+    { icon: <Code2 size={18} />,      title: t('feat_matrix_title'),  desc: t('feat_matrix_desc'),  borderCls: 'border-primary', textCls: 'text-primary', gradCls: 'from-primary/5' },
+    { icon: <Zap size={18} />,        title: t('feat_themes_title'),  desc: t('feat_themes_desc'),  borderCls: 'border-cursor',  textCls: 'text-cursor',  gradCls: 'from-cursor/5'  },
+    { icon: <FolderGit2 size={18} />, title: t('feat_oss_title'),     desc: t('feat_oss_desc'),     borderCls: 'border-prompt',  textCls: 'text-prompt',  gradCls: 'from-prompt/5'  },
+    { icon: <Globe size={18} />,      title: t('feat_arsenal_title'), desc: t('feat_arsenal_desc'), borderCls: 'border-primary', textCls: 'text-primary', gradCls: 'from-primary/8' },
+    { icon: <Keyboard size={18} />,   title: t('feat_kb_title'),      desc: t('feat_kb_desc'),      borderCls: 'border-cursor',  textCls: 'text-cursor',  gradCls: 'from-cursor/8'  },
   ];
 
   const faqItems = [
@@ -154,6 +156,19 @@ const Home = () => {
     { q: t('faq_3_q'), a: t('faq_3_a'), borderCls: 'border-prompt',  textCls: 'text-prompt'  },
     { q: t('faq_4_q'), a: t('faq_4_a'), borderCls: 'border-primary', textCls: 'text-primary' },
     { q: t('faq_5_q'), a: t('faq_5_a'), borderCls: 'border-cursor',  textCls: 'text-cursor'  },
+    { q: t('faq_6_q'), a: t('faq_6_a'), borderCls: 'border-prompt',  textCls: 'text-prompt'  },
+  ];
+
+  const arsenalModules = [
+    { id: 'device',   name: 'DEVICE INTEGRITY', tagline: 'Root · ADB · bootloader · emulator',         severity: 'HIGH',   color: 'text-cursor',  isNew: false },
+    { id: 'access',   name: 'ACCESS CONTROL',   tagline: 'Screen lock · biometrics · lock strength',   severity: 'MEDIUM', color: 'text-prompt',  isNew: false },
+    { id: 'apprisk',  name: 'APP RISK',          tagline: 'Dangerous perms · sideloads · debug flags',  severity: 'MEDIUM', color: 'text-primary', isNew: false },
+    { id: 'trust',    name: 'TRUST STORE',       tagline: 'User CAs · MITM proxy detection',            severity: 'HIGH',   color: 'text-cursor',  isNew: false },
+    { id: 'network',  name: 'NETWORK INTEL',     tagline: 'IP · DNS · VPN · metered detection',         severity: 'LOW',    color: 'text-primary', isNew: false },
+    { id: 'runtime',  name: 'RUNTIME TELEMETRY', tagline: 'Memory · CPU threads · process lifetime',    severity: 'INFO',   color: 'text-prompt',  isNew: false },
+    { id: 'portscan', name: 'PORT SCAN',         tagline: 'TCP probe — 18 ports · localhost & gateway', severity: 'MEDIUM', color: 'text-cursor',  isNew: true  },
+    { id: 'wifi',     name: 'WIFI RECON',        tagline: 'Signal · band · WEP/OPEN detection',         severity: 'LOW',    color: 'text-primary', isNew: true  },
+    { id: 'ssl',      name: 'SSL INSPECTOR',     tagline: 'TLS audit — expiry · protocol · issuer',     severity: 'INFO',   color: 'text-prompt',  isNew: true  },
   ];
 
   return (
@@ -262,7 +277,8 @@ const Home = () => {
                 <div className="pl-5 opacity-70">│   └── usecase/     <span className="opacity-50"># Business logic</span></div>
                 <div className="hover:text-white transition-colors mt-2 cursor-crosshair">├── data/ <span className="opacity-40 text-[10px]">// Adapters</span></div>
                 <div className="pl-5 opacity-70">│   ├── repository/  <span className="opacity-50"># Implementations</span></div>
-                <div className="pl-5 opacity-70">│   └── source/      <span className="opacity-50"># DataStore / PM</span></div>
+                <div className="pl-5 opacity-70">│   ├── source/      <span className="opacity-50"># DataStore / PM</span></div>
+                <div className="pl-5 text-cursor/80">│   └── arsenal/     <span className="opacity-50"># 9 security modules</span></div>
                 <div className="hover:text-white transition-colors mt-2 cursor-crosshair">└── presentation/ <span className="opacity-40 text-[10px]">// UI layer</span></div>
                 <div className="pl-5 opacity-70">    ├── ui/          <span className="opacity-50"># Jetpack Compose</span></div>
                 <div className="pl-5 opacity-70">    └── viewmodel/   <span className="opacity-50"># StateFlow holders</span></div>
@@ -273,6 +289,55 @@ const Home = () => {
               Live Memory: Optimal. GC cycles reduced ~40% via strictly scoped ViewModels.
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── Arsenal Modules Grid ─────────────────────────────── */}
+      <section className="flex flex-col gap-8" aria-label="Arsenal security modules">
+        <div className="flex flex-col gap-2 relative pl-6">
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-cursor to-transparent opacity-30" aria-hidden="true" />
+          <div className="absolute left-[-3px] top-2 w-2 h-2 bg-cursor animate-ping rounded-full" aria-hidden="true" />
+          <div className="font-mono text-[10px] text-on-surface tracking-[0.3em] uppercase">
+            [ARSENAL_REGISTRY: 9/9 MODULES LOADED]
+          </div>
+          <h2 className="text-3xl font-bold font-mono uppercase tracking-wider text-white">
+            <DecryptText text={t('arsenal_section_title')} />
+          </h2>
+          <p className="text-on-background max-w-2xl text-sm font-mono leading-relaxed border-l-2 border-cursor/40 pl-4 py-1">
+            {t('arsenal_section_desc')}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {arsenalModules.map((mod, i) => {
+            const severityColor: Record<string, string> = {
+              CRITICAL: 'text-red-400 border-red-400/40 bg-red-400/5',
+              HIGH:     'text-orange-400 border-orange-400/40 bg-orange-400/5',
+              MEDIUM:   'text-yellow-400 border-yellow-400/40 bg-yellow-400/5',
+              LOW:      'text-blue-400 border-blue-400/40 bg-blue-400/5',
+              INFO:     'text-green-400 border-green-400/40 bg-green-400/5',
+            };
+            return (
+              <motion.div
+                key={mod.id}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06, duration: 0.35 }}
+                className="border border-border bg-black/60 p-4 relative group hover:border-primary/30 transition-colors overflow-hidden"
+              >
+                {mod.isNew && (
+                  <span className="absolute top-3 right-3 text-[9px] font-mono font-bold text-cursor border border-cursor/50 px-1.5 py-0.5 bg-cursor/10">NEW</span>
+                )}
+                <div className={`font-mono text-xs font-bold mb-1 ${mod.color}`}>{mod.name}</div>
+                <p className="text-on-surface font-mono text-[11px] leading-relaxed mb-3">{mod.tagline}</p>
+                <span className={`text-[9px] font-mono font-bold px-2 py-0.5 border ${severityColor[mod.severity] ?? ''}`}>
+                  ▲ {mod.severity}
+                </span>
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 

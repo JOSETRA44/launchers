@@ -41,7 +41,7 @@ export const TerminalSimulator = () => {
     const parts = trimmed.split(/\s+/);
     let rawCmd = parts[0].toLowerCase();
     
-    if (!rawCmd.startsWith('/') && ['theme', 'sec', 'stats', 'genpass', 'help', 'clean', 'cls', '?'].includes(rawCmd)) {
+    if (!rawCmd.startsWith('/') && ['theme', 'sec', 'stats', 'genpass', 'help', 'clean', 'cls', '?', 'scan', 'portscan', 'wifi', 'ssl', 'kb'].includes(rawCmd)) {
       rawCmd = '/' + rawCmd;
     }
     
@@ -53,10 +53,14 @@ export const TerminalSimulator = () => {
       case '/help':
       case '?':
         addLine('Available Terminal Directives:');
-        addLine('  /theme <dark|cyan|matrix> : Live style theme toggle');
+        addLine('  /theme <dark|cyan|matrix>  : Live style theme toggle');
         addLine('  /sec                       : Audits browser environment status');
+        addLine('  /scan                      : TCP port scan simulation');
+        addLine('  /wifi                      : WiFi recon simulation');
+        addLine('  /ssl                       : TLS chain audit simulation');
         addLine('  /stats                     : Pulls screen time insight metrics');
         addLine('  /genpass <length>          : Builds random character passwords');
+        addLine('  /kb                        : Terminal keyboard info');
         addLine('  /clean, cls, clear         : Wipes terminal log rows');
         break;
       case '/theme':
@@ -92,6 +96,70 @@ export const TerminalSimulator = () => {
         addLine('Generated Secure Token:');
         addLine(pass, false, 'text-cursor font-bold tracking-wider break-all');
         break;
+      case '/scan':
+      case '/portscan': {
+        addLine('Initializing PORT SCAN module...', false, 'text-cursor font-bold');
+        const ports = [
+          { port: 22, svc: 'SSH',    open: false },
+          { port: 80, svc: 'HTTP',   open: true  },
+          { port: 443, svc: 'HTTPS', open: true  },
+          { port: 3306, svc: 'MYSQL', open: false },
+          { port: 8080, svc: 'HTTP-X', open: false },
+        ];
+        let delay = 200;
+        ports.forEach(({ port, svc, open }) => {
+          setTimeout(() => {
+            addLine(
+              `  ${port}/${svc.padEnd(8)} ${open ? '<span class="text-yellow-400">OPEN</span>' : '<span class="text-primary/50">CLOSED</span>'}`,
+              true
+            );
+          }, delay);
+          delay += 120;
+        });
+        setTimeout(() => {
+          addLine('LOCALHOST · 2 OPEN · 3 CLOSED', false, 'text-cursor font-bold');
+        }, delay + 100);
+        break;
+      }
+      case '/wifi': {
+        addLine('Initializing WIFI RECON module...', false, 'text-cursor font-bold');
+        setTimeout(() => {
+          addLine('  SIGNAL       ████░  GOOD · -62 dBm');
+          addLine('  LINK SPEED   240 Mbps');
+          addLine('  BAND         5 GHz');
+          addLine('  NETWORKS     12 visible · 0 OPEN · 0 WEP · 3 WPA3', false, 'text-primary');
+        }, 300);
+        break;
+      }
+      case '/ssl': {
+        addLine('Initializing SSL INSPECTOR module...', false, 'text-cursor font-bold');
+        const domains = [
+          { host: 'google.com',    days: 72,  ok: true  },
+          { host: 'cloudflare.com', days: 120, ok: true  },
+          { host: 'github.com',    days: 45,  ok: true  },
+        ];
+        let sslDelay = 300;
+        domains.forEach(({ host, days, ok }) => {
+          setTimeout(() => {
+            addLine(
+              `  ${host.padEnd(16)} <span class="${ok ? 'text-primary' : 'text-error'}">${ok ? `valid ${days}d · TLSv1.3` : 'EXPIRED'}</span>`,
+              true
+            );
+          }, sslDelay);
+          sslDelay += 180;
+        });
+        setTimeout(() => {
+          addLine('3 DOMAINS · 0 WARNINGS', false, 'text-cursor font-bold');
+        }, sslDelay + 100);
+        break;
+      }
+      case '/kb':
+        addLine('TERMINAL KEYBOARD — TensorKeyboard v1.0', false, 'text-cursor font-bold');
+        addLine('  Rows: command chips · digits · QWERTY · alpha · symbols');
+        addLine('  Features: shift toggle · quick /commands · dismiss [×]');
+        addLine('  Trigger: tap [⌨] in nav bar · back gesture dismisses');
+        addLine('  Style: adapts to active theme (Dark / Cyan / Matrix)');
+        break;
       case '/clean':
       case 'cls':
         setLines([]);
@@ -108,7 +176,7 @@ export const TerminalSimulator = () => {
     }
   };
 
-  const chips = ['/help', '/sec', '/stats', '/theme cyan', '/theme dark', '/theme matrix', '/genpass 24'];
+  const chips = ['/help', '/scan', '/wifi', '/ssl', '/sec', '/stats', '/theme cyan', '/theme dark', '/theme matrix', '/genpass 24', '/kb'];
 
   return (
     <div className="flex flex-col gap-4 w-full">

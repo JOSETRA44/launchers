@@ -4,6 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -28,11 +30,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.tien.tensor.R
@@ -42,6 +47,7 @@ import com.tien.tensor.di.AppModule
 import com.tien.tensor.domain.model.AppInfo
 import com.tien.tensor.domain.model.SmartApp
 import com.tien.tensor.presentation.navigation.AppDestination
+import com.tien.tensor.ui.component.TensorKeyboard
 import com.tien.tensor.ui.component.TerminalButton
 import com.tien.tensor.ui.component.TerminalDivider
 import com.tien.tensor.ui.component.TerminalPromptHeader
@@ -59,6 +65,8 @@ fun LauncherScreen(
     viewModel: LauncherViewModel = viewModel(factory = AppModule.launcherViewModelFactory())
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var showKeyboard by remember { mutableStateOf(false) }
+    val kbCtrl = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(viewModel) {
         viewModel.navigationEvents.collect { dest -> onNavigate(dest) }
@@ -67,11 +75,12 @@ fun LauncherScreen(
     // System back peels home overlays one at a time — exactly the same state
     // change as their tap-to-dismiss action — instead of being swallowed by
     // the activity-level handler. Priority mirrors the render order below.
-    BackHandler(enabled = state.showChargingOverlay || state.activeFolderId != null || state.showHelp) {
+    BackHandler(enabled = state.showChargingOverlay || state.activeFolderId != null || state.showHelp || showKeyboard) {
         when {
             state.showChargingOverlay    -> viewModel.onDismissChargingOverlay()
             state.activeFolderId != null -> viewModel.onCloseFolderOverlay()
-            else                         -> viewModel.onDismissHelp()
+            state.showHelp               -> viewModel.onDismissHelp()
+            else                         -> showKeyboard = false
         }
     }
 
@@ -227,12 +236,35 @@ fun LauncherScreen(
                 TerminalButton(label = "SEC",   onClick = { onNavigate(AppDestination.SECURITY) }, modifier = Modifier.weight(1f))
                 TerminalButton(label = "STATS", onClick = { onNavigate(AppDestination.INSIGHTS) }, modifier = Modifier.weight(1f))
                 TerminalButton(label = "CFG",   onClick = { onNavigate(AppDestination.SETTINGS) }, modifier = Modifier.weight(1f))
+                TerminalButton(
+                    label  = "⌨",
+                    active = showKeyboard,
+                    onClick = {
+                        showKeyboard = !showKeyboard
+                        if (showKeyboard) kbCtrl?.hide()
+                    },
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
 
         AnimatedVisibility(visible = state.launchingAppName != null, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.align(Alignment.BottomCenter)) {
             Text(text = stringResource(R.string.home_launching, state.launchingAppName?.uppercase() ?: ""), style = MaterialTheme.typography.labelMedium, color = colors.primary,
                 modifier = Modifier.fillMaxWidth().background(colors.surface).padding(TensorSpacing.md))
+        }
+
+        AnimatedVisibility(
+            visible  = showKeyboard,
+            enter    = slideInVertically { it },
+            exit     = slideOutVertically { it },
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            TensorKeyboard(
+                onKey       = { char -> viewModel.onSearchQueryChanged(state.searchQuery + char) },
+                onBackspace = { if (state.searchQuery.isNotEmpty()) viewModel.onSearchQueryChanged(state.searchQuery.dropLast(1)) },
+                onEnter     = { viewModel.onSearchSubmit(); showKeyboard = false },
+                onDismiss   = { showKeyboard = false }
+            )
         }
     }
 }

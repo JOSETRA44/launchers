@@ -35,8 +35,11 @@ import com.tien.tensor.data.arsenal.AppRiskModule
 import com.tien.tensor.data.arsenal.ArsenalRegistryImpl
 import com.tien.tensor.data.arsenal.DeviceIntegrityModule
 import com.tien.tensor.data.arsenal.NetworkIntelModule
+import com.tien.tensor.data.arsenal.PortScanModule
 import com.tien.tensor.data.arsenal.RuntimeTelemetryModule
+import com.tien.tensor.data.arsenal.SslInspectorModule
 import com.tien.tensor.data.arsenal.TrustStoreModule
+import com.tien.tensor.data.arsenal.WifiScannerModule
 import com.tien.tensor.data.source.UsageStatsDataSource
 import com.tien.tensor.domain.port.AppInfoLauncher
 import com.tien.tensor.domain.port.AppLauncher
@@ -152,7 +155,10 @@ object AppModule {
                 AppRiskModule(appContext),
                 TrustStoreModule(),
                 NetworkIntelModule(appContext),
-                RuntimeTelemetryModule(appContext)
+                RuntimeTelemetryModule(appContext),
+                PortScanModule(appContext),
+                WifiScannerModule(appContext),
+                SslInspectorModule()
             )
         )
     }

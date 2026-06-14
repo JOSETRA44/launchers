@@ -24,15 +24,15 @@ const translations = {
     stat_downloads: 'Downloads',
     stat_version: 'Latest',
     stat_themes: 'Themes',
-    stat_perms: 'Extra Perms',
+    stat_arsenal: 'Arsenal Modules',
     // Architecture section
     engineered: 'Engineered For Power Users',
-    engineered_desc: 'Deep system integrations, efficient fuzzy matching engines, and defensive tools to audit your Android environment directly.',
+    engineered_desc: 'Deep system integrations, efficient fuzzy matching engines, and nine active security modules to audit your entire Android environment without leaving the home screen.',
     // Feature cards
     feat_cli_title: 'CLI ENGINE_',
     feat_cli_desc: 'Fuzzy-matching architecture executing system directives, launching deep-linked apps, and manipulating state instantly. Zero-lag parsing via coroutines.',
     feat_sec_title: 'SECURITY.SYS_',
-    feat_sec_desc: 'Passive environment auditing. Detects active ADB debug states, root binaries, and evaluates device lock integrity. Built-in cryptographic token generator.',
+    feat_sec_desc: 'Nine pluggable Arsenal modules: device integrity, access control, app risk, trust store, network intel, runtime telemetry, port scanner, WiFi recon, and SSL inspector.',
     feat_cache_title: 'SMART CACHE_',
     feat_cache_desc: 'A localized neural-like decay algorithm ranks your apps. Apps you ignore drop in priority over time. Stored efficiently in DataStore.',
     feat_matrix_title: 'MATRIX RAIN_',
@@ -41,6 +41,13 @@ const translations = {
     feat_themes_desc: 'Hacker Dark, Hacker Cyan, and Matrix Green palettes. All colors are semantic CSS tokens. Switch themes live from the terminal using /theme.',
     feat_oss_title: 'OPEN SOURCE_',
     feat_oss_desc: 'MIT licensed. Full DDD Clean Architecture — domain, data, and presentation layers. Zero hardcoded colors. 600-line limit per file enforced.',
+    feat_arsenal_title: 'ARSENAL_',
+    feat_arsenal_desc: 'TCP port scanner probing 18 services. WiFi recon enumerating nearby networks and flagging WEP/open APs. SSL inspector auditing TLS chains for 4 domains.',
+    feat_kb_title: 'TERMINAL KB_',
+    feat_kb_desc: 'In-app terminal keyboard replaces the system IME. Quick-command chips, full QWERTY, shift, symbols, and a dismiss key. No system keyboard ever breaks the aesthetic.',
+    // Arsenal section
+    arsenal_section_title: 'Arsenal Modules',
+    arsenal_section_desc: 'Nine security plugins scanning your device, local network, and TLS infrastructure. Each module emits structured findings ranked by severity.',
     // Install
     install_title: 'Install in 3 Steps',
     install_step1: 'Download the APK',
@@ -61,6 +68,8 @@ const translations = {
     faq_4_a: 'No root required. The /sec command performs passive auditing using standard Android APIs — it reads environment flags without executing privileged shell commands.',
     faq_5_q: 'How does smart app ranking work?',
     faq_5_a: 'Tensor uses a time-decay frequency score. Each launch adds weight; weight decays exponentially over time. Apps you stop using gradually sink below fresh ones.',
+    faq_6_q: 'What does the custom keyboard do?',
+    faq_6_a: 'The built-in terminal keyboard replaces the system IME entirely. It provides a full QWERTY layout, quick-command chips (/sec, /stats, /theme...), shift, symbols, and backspace — all styled to match the active theme. Tap ⌨ in the nav bar to toggle it.',
   },
   es: {
     // Hero
@@ -77,15 +86,15 @@ const translations = {
     stat_downloads: 'Descargas',
     stat_version: 'Versión',
     stat_themes: 'Temas',
-    stat_perms: 'Permisos Extra',
+    stat_arsenal: 'Módulos Arsenal',
     // Architecture section
     engineered: 'Diseñado Para Usuarios Avanzados',
-    engineered_desc: 'Con integraciones profundas en el sistema, motores de coincidencia difusa y herramientas defensivas para auditar tu entorno Android al instante.',
+    engineered_desc: 'Integraciones profundas en el sistema, motores de búsqueda difusa y nueve módulos de seguridad activos para auditar todo tu entorno Android sin salir del launcher.',
     // Feature cards
     feat_cli_title: 'MOTOR CLI_',
     feat_cli_desc: 'Arquitectura con búsqueda difusa que ejecuta directivas del sistema, lanza apps con deep links y manipula el estado al instante. Parsing sin latencia con coroutines.',
     feat_sec_title: 'SEGURIDAD.SYS_',
-    feat_sec_desc: 'Auditoría pasiva del entorno. Detecta estados ADB activos, binarios root, e integridad del bloqueo de pantalla. Incluye generador criptográfico de tokens.',
+    feat_sec_desc: 'Nueve módulos Arsenal enchufables: integridad del dispositivo, control de acceso, riesgo de apps, almacén de confianza, intel de red, telemetría, escaneo de puertos, WiFi recon e inspector SSL.',
     feat_cache_title: 'CACHÉ INTELIGENTE_',
     feat_cache_desc: 'Un algoritmo de decaimiento ordena tus apps. Las que no usas bajan de prioridad con el tiempo. Almacenado eficientemente en DataStore.',
     feat_matrix_title: 'LLUVIA MATRIX_',
@@ -94,6 +103,13 @@ const translations = {
     feat_themes_desc: 'Paletas Hacker Dark, Hacker Cyan y Matrix Green. Todos los colores son tokens CSS semánticos. Cambia el tema en vivo desde la terminal con /theme.',
     feat_oss_title: 'CÓDIGO ABIERTO_',
     feat_oss_desc: 'Licencia MIT. Arquitectura DDD completa — capas dominio, datos y presentación. Sin colores hardcodeados. Límite de 600 líneas por archivo.',
+    feat_arsenal_title: 'ARSENAL_',
+    feat_arsenal_desc: 'Escáner TCP de 18 servicios. Recon WiFi que enumera redes cercanas y detecta WEP/abiertas. Inspector SSL que audita cadenas TLS en 4 dominios en paralelo.',
+    feat_kb_title: 'TECLADO TERMINAL_',
+    feat_kb_desc: 'Teclado integrado que reemplaza el IME del sistema. Chips de comandos rápidos, QWERTY completo, shift, símbolos y tecla dismiss. El sistema nunca rompe la estética.',
+    // Arsenal section
+    arsenal_section_title: 'Módulos Arsenal',
+    arsenal_section_desc: 'Nueve plugins de seguridad que escanean tu dispositivo, red local e infraestructura TLS. Cada módulo emite hallazgos estructurados clasificados por severidad.',
     // Install
     install_title: 'Instala en 3 Pasos',
     install_step1: 'Descarga el APK',
@@ -114,6 +130,8 @@ const translations = {
     faq_4_a: 'No se necesita root. El comando /sec realiza auditoría pasiva usando APIs estándar de Android — lee flags del entorno sin ejecutar comandos de shell privilegiados.',
     faq_5_q: '¿Cómo funciona el ranking inteligente de apps?',
     faq_5_a: 'Tensor usa una puntuación de frecuencia con decaimiento temporal. Cada lanzamiento añade peso; el peso decae exponencialmente. Las apps que dejas de usar bajan gradualmente.',
+    faq_6_q: '¿Para qué sirve el teclado personalizado?',
+    faq_6_a: 'El teclado integrado reemplaza completamente el IME del sistema. Ofrece QWERTY completo, chips de comandos rápidos (/sec, /stats, /theme...), shift, símbolos y retroceso — todo en el estilo del tema activo. Toca ⌨ en la barra de navegación para activarlo.',
   }
 };
 
