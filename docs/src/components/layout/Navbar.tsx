@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Terminal, Star, Clock, X, Menu, Globe, ChevronRight, Download } from 'lucide-react';
+import { Terminal, Star, Clock, Layers, X, Menu, Globe, ChevronRight, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../LanguageContext';
 
@@ -17,9 +17,10 @@ const Navbar = () => {
   }, [menuOpen]);
 
   const navItems = [
-    { name: t('nav_home'),      path: '/',          icon: <Terminal size={15} />, isExternal: false },
-    { name: t('nav_reviews'),   path: '/resenas',   icon: <Star size={15} />,    isExternal: false },
-    { name: t('nav_changelog'), path: '/versiones', icon: <Clock size={15} />,   isExternal: false },
+    { name: t('nav_home'),      path: '/',           icon: <Terminal size={15} />, isExternal: false },
+    { name: t('nav_features'),  path: '/funciones',  icon: <Layers size={15} />,  isExternal: false },
+    { name: t('nav_reviews'),   path: '/resenas',    icon: <Star size={15} />,    isExternal: false },
+    { name: t('nav_changelog'), path: '/versiones',  icon: <Clock size={15} />,   isExternal: false },
   ];
 
   const isActive = (path: string, isExternal: boolean) =>
