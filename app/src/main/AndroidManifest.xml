@@ -9,6 +9,18 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- Bluetooth recon (arsenal). Legacy grants for API ≤ 30 … -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <!-- … and the runtime Nearby-devices grants for API 31+. neverForLocation
+         signals we do not derive physical location from BLE beacons. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <!-- Optional: only used to show the exact cellular generation (5G/4G/...).
          Without the grant the status bar degrades to a generic CELL label. -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />

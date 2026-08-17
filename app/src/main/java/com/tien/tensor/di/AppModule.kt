@@ -33,6 +33,7 @@ import com.tien.tensor.data.source.WallpaperDataSource
 import com.tien.tensor.data.arsenal.AccessControlModule
 import com.tien.tensor.data.arsenal.AppRiskModule
 import com.tien.tensor.data.arsenal.ArsenalRegistryImpl
+import com.tien.tensor.data.arsenal.BluetoothScannerModule
 import com.tien.tensor.data.arsenal.DeviceIntegrityModule
 import com.tien.tensor.data.arsenal.NetworkIntelModule
 import com.tien.tensor.data.arsenal.PortScanModule
@@ -158,6 +159,7 @@ object AppModule {
                 RuntimeTelemetryModule(appContext),
                 PortScanModule(appContext),
                 WifiScannerModule(appContext),
+                BluetoothScannerModule(appContext),
                 SslInspectorModule()
             )
         )
