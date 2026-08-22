@@ -1,5 +1,8 @@
 package com.tien.tensor.presentation.arsenal
 
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,10 +15,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import com.tien.tensor.R
 import com.tien.tensor.domain.model.Finding
 import com.tien.tensor.domain.model.ModuleMeta
@@ -65,6 +74,8 @@ fun ArsenalDetailPanel(
 
     TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
 
+    PermissionGate(meta, onRescan)
+
     when {
         report == null && scanning ->
             Text(text = stringResource(R.string.arsenal_running), style = MaterialTheme.typography.bodySmall, color = colors.onBackground)
@@ -77,6 +88,47 @@ fun ArsenalDetailPanel(
                     Spacer(Modifier.height(TensorSpacing.sm))
                 }
             }
+    }
+}
+
+/**
+ * One-tap runtime-permission request for modules that declare
+ * [ModuleMeta.requiredPermissions]. Renders nothing when every permission is
+ * already granted; otherwise shows why the module is degraded and a button
+ * that requests the missing grants, re-running the scan on return.
+ */
+@Composable
+private fun PermissionGate(meta: ModuleMeta, onRescan: () -> Unit) {
+    if (meta.requiredPermissions.isEmpty()) return
+    val colors = LauncherTheme.colors
+    val context = LocalContext.current
+    var recheck by remember { mutableIntStateOf(0) }
+
+    val missing = remember(meta, recheck) {
+        meta.requiredPermissions.filter {
+            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+        }
+    }
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) {
+        recheck++
+        onRescan()
+    }
+
+    if (missing.isEmpty()) return
+    Column(modifier = Modifier.fillMaxWidth().padding(bottom = TensorSpacing.sm)) {
+        Text(
+            text  = stringResource(R.string.arsenal_perm_required),
+            style = MaterialTheme.typography.labelSmall,
+            color = colors.cursor
+        )
+        Spacer(Modifier.height(TensorSpacing.xs))
+        TerminalButton(
+            label   = stringResource(R.string.arsenal_perm_grant),
+            onClick = { launcher.launch(missing.toTypedArray()) }
+        )
+        TerminalDivider(Modifier.padding(vertical = TensorSpacing.sm))
     }
 }
 

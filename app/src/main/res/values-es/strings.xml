@@ -119,4 +119,6 @@
     <string name="arsenal_no_data">> sin datos.</string>
     <string name="arsenal_badge_clean">[LIMPIO]</string>
     <string name="arsenal_badge_scanning">[ESCANEANDO]</string>
+    <string name="arsenal_perm_required">! PERMISO REQUERIDO — el módulo funciona limitado sin él</string>
+    <string name="arsenal_perm_grant">[ CONCEDER ACCESO ]</string>
 </resources>
