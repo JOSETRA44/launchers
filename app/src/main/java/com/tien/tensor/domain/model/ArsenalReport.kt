@@ -21,7 +21,14 @@ data class ModuleMeta(
     val name: String,
     val tagline: String,
     /** True when the module emits continuously (live telemetry) instead of one-shot scans. */
-    val isStreaming: Boolean
+    val isStreaming: Boolean,
+    /**
+     * Android runtime permissions the module needs for full function, as raw
+     * permission strings (kept as plain Strings so the domain layer stays
+     * framework-agnostic). Empty for modules that need no dangerous grant; the
+     * arsenal UI offers a one-tap request for any that are still missing.
+     */
+    val requiredPermissions: List<String> = emptyList()
 )
 
 data class ModuleReport(

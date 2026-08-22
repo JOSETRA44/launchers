@@ -43,7 +43,14 @@ class BluetoothScannerModule(private val context: Context) : SecurityModule {
         id          = "bt_recon",
         name        = "BLUETOOTH RECON",
         tagline     = "Paired · near-field · GPU passkey benchmark",
-        isStreaming = false
+        isStreaming = false,
+        // API 31+ splits Bluetooth into runtime "Nearby devices" grants; older
+        // releases route BLE discovery through fine location instead.
+        requiredPermissions =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+                listOf("android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT")
+            else
+                listOf("android.permission.ACCESS_FINE_LOCATION")
     )
 
     override fun observe(): Flow<ModuleReport> = flow {
