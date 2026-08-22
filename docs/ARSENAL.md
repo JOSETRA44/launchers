@@ -64,6 +64,7 @@ leave the screen.
 | **TRUST STORE** | one-shot | Enumerates `AndroidCAStore`: user-installed CA certificates (TLS MITM surface, flagged HIGH with subject CN) vs system authorities |
 | **NET INTEL** | streaming | Live `LinkProperties`/`NetworkCapabilities` of the default network: HTTP proxy on the link (possible MITM), Private DNS (DoT) state, captive portal, unvalidated network, VPN, resolvers, local addressing |
 | **SYS TELEMETRY** | streaming (2.5 s) | Memory pressure (`ActivityManager`), storage headroom (`StatFs`), battery temperature/voltage, thermal throttling (`PowerManager.currentThermalStatus`), uptime |
+| **BLUETOOTH RECON** | one-shot | Adapter state + discoverability, bonded (paired) devices classified by type/bond (HID input, opaque bonds), a 4 s passive BLE scan of nearby advertisers with RSSI, and a **GPU passkey benchmark**: exhausts the 10⁶ BLE Legacy passkey space on the phone's GPU (OpenGL ES 3.1 compute shader, CPU fallback) to demonstrate why Legacy pairing is broken. Reads local state only — never injects pairing against third-party devices. Declares runtime `requiredPermissions` and offers a one-tap grant. |
 
 ## Severity model
 
@@ -74,6 +75,15 @@ finding; all-INFO reports render as `[CLEAN]`. Colors map to theme tokens
 
 ## Permissions
 
-The arsenal needs **no new permissions**: it reuses `QUERY_ALL_PACKAGES`
-(app list already requires it), `ACCESS_NETWORK_STATE` and `ACCESS_WIFI_STATE`.
-Everything else reads world-readable system state.
+Most modules need **no new permissions**: they reuse `QUERY_ALL_PACKAGES`
+(app list already requires it), `ACCESS_NETWORK_STATE` and `ACCESS_WIFI_STATE`,
+reading world-readable system state.
+
+The one exception is **BLUETOOTH RECON**, which needs runtime grants for full
+function: `BLUETOOTH_SCAN` + `BLUETOOTH_CONNECT` on API 31+ (declared
+`neverForLocation`), or `ACCESS_FINE_LOCATION` on older releases for BLE
+discovery. A module advertises what it needs via `ModuleMeta.requiredPermissions`;
+the detail panel checks them and shows a one-tap **GRANT ACCESS** button for any
+still missing, re-running the scan once granted. Modules degrade gracefully
+without the grant (they show only the state they can read). The GPU passkey
+benchmark needs no permission — it only touches the device's own GPU/CPU.
